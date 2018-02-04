@@ -27,8 +27,6 @@ public class TurnToAction extends Action {
 		
 		targetAngle = Util.getPosAngle(robot.getPosition2D(), target);
 
-		System.out.println("Current: " + robot.getPosAngle() + ", Target: " + targetAngle);
-		
 		float angularSpeed = robot.getMovementSpeed().x / robot.getDistanceBetweenWheels();
 		float difference = robot.getPosAngle() - targetAngle;
 		if(difference < 0)

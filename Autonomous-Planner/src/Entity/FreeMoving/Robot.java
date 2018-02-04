@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 import com.Engine.Demo.RenderTester;
 import com.Engine.RenderEngine.Font.Font;
@@ -35,20 +34,38 @@ public class Robot extends Entity {
 	private float distanceBetweenWheels;
 	
 	private boolean edit;
-	private int vectorEditIndex;
-	private ArrayList<Vector2f> verticies;
-	private Vector2f spawn;
 	
-	public Robot(Handler handler, WrapperModel wrapperModel, Texture2D texture, Vector2f spawn, float movementSpeed, int teamNumber) {
+	private int listIndex;
+	private int vectorEditIndex;
+	
+	private ArrayList<Vector2f> rl;
+	private ArrayList<Vector2f> lr;
+	private ArrayList<Vector2f> rr;
+	private ArrayList<Vector2f> ll;
+	
+	//Current
+	private ArrayList<Vector2f> verticies;
+	
+	private Vector2f spawn;
+	private Vector3f color;
+	
+	public Robot(Handler handler, WrapperModel wrapperModel, Texture2D texture, Vector2f spawn, Vector3f color, float movementSpeed, int teamNumber) {
 		super(handler, wrapperModel, texture);
 		
 		this.spawn = spawn;
 		this.teamNumber = teamNumber;
 		this.movementSpeed = new Vector2f(movementSpeed);
+		this.color = color;
 
 		vectorEditIndex = -1;
+
+		rl = new ArrayList<>();
+		lr = new ArrayList<>();
+		ll = new ArrayList<>();
+		rr = new ArrayList<>();
 		
-		verticies = new ArrayList<>();
+		verticies = rr;
+		
 		distanceBetweenWheels = 5;
 		spawn();
 		
@@ -83,13 +100,43 @@ public class Robot extends Entity {
 	public void update(float delta) {
 		actionQueue.update(delta);
 
+		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RIGHT)) {
+			listIndex++;
+			
+			if(listIndex == 4)
+				listIndex = 0;
+			
+			if(listIndex == 0)
+				verticies = ll;
+			else if(listIndex == 1)
+				verticies = lr;
+			else if(listIndex == 2)
+				verticies = rl;
+			else
+				verticies = rr;
+		} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_LEFT)) {
+			listIndex--;
+			
+			if(listIndex == -1)
+				listIndex = 3;
+			
+			if(listIndex == 0)
+				verticies = ll;
+			else if(listIndex == 1)
+				verticies = lr;
+			else if(listIndex == 2)
+				verticies = rl;
+			else
+				verticies = rr;
+		}
+		
 		if(edit) {
 			if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DELETE)) {
 				if(vectorEditIndex != -1) {
 					verticies.remove(vectorEditIndex);
 					vectorEditIndex = -1;
 				}
-			} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_INSERT)) {
+			} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RETURN)) {
 				if(vectorEditIndex == -1)
 					vectorEditIndex = verticies.size();
 				else
@@ -144,18 +191,18 @@ public class Robot extends Entity {
 		text.render(textProperties);
 		
 		if(verticies.size() > 0) {
-			drawLine(spawn.add(getWidth() / 2, getHeight() / 2), verticies.get(0), new Vector3f(0, 0, 1));
+			drawLine(spawn.add(getWidth() / 2, getHeight() / 2), verticies.get(0));
 			
 			if(verticies.size() > 1) {
 				for(int i = 0; i < verticies.size() - 1; i++) {
-					drawLine(verticies.get(i), verticies.get(i + 1), new Vector3f(0, 0, 1));
+					drawLine(verticies.get(i), verticies.get(i + 1));
 				}
 			}
 		}
 	}
 	
-	private void drawLine(Vector2f from, Vector2f to, Vector3f color) {
-		handler.getWorld().drawLine(Util.to3D(from, lineElevation), Util.to3D(to, lineElevation));
+	private void drawLine(Vector2f from, Vector2f to) {
+		handler.getWorld().drawLine(Util.to3D(from, lineElevation), Util.to3D(to, lineElevation), color);
 	}
 	
 //	public void update(float delta) {
@@ -191,6 +238,9 @@ public class Robot extends Entity {
 //		
 //		push(translate.multiply(1, -1), delta);
 //	}
+	
+	public void edit() { this.edit = true; }
+	public void disableEdit() { this.edit = false; }
 	
 	public float getDistanceBetweenWheels() { return distanceBetweenWheels; }
 	public int getTeamNumber() { return teamNumber; }
