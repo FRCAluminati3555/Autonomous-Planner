@@ -178,7 +178,26 @@ public class Robot extends Entity {
 				} else 
 					vectorEditIndex = -1;
 			} else if(vectorEditIndex != -1) {
-				verticies.get(vectorEditIndex).set(Util.to2D(MousePicker.calculateHitPosition(lineElevation)));
+				
+				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
+				
+				if(Keyboard.isKeyDown(Keyboard.KEY_F)) {
+					Vector2f anchor = null;
+					if(vectorEditIndex == 0)
+						anchor = getPosition2D();
+					else
+						anchor = verticies.get(vectorEditIndex - 1);
+					
+					if(Math.abs(anchor.x - position.x) > Math.abs(anchor.y - position.y)) {
+						if(position.getX() < + handler.getWorld().getField().getWidth() && position.x > 0)
+							position.y = anchor.y;
+	//						dragList.fill(WorldObjectDragList.AXIS.X_AXIS, new Vector2f(s.x, s.z));
+					} else if(position.y < handler.getWorld().getField().getHeight() && position.y > 0)
+	//						dragList.fill(WorldObjectDragList.AXIS.Z_AXIS, new Vector2f(s.x, s.z));
+							position.x = anchor.x;
+				}
+				
+				verticies.get(vectorEditIndex).set(position);
 			}
 		}
 	}
