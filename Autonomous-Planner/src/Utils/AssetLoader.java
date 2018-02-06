@@ -10,6 +10,7 @@ import com.Engine.RenderEngine.Textures.Texture2D;
 public class AssetLoader {
 	public static final String MODEL_PATH = "res/models/";
 	public static final String TEXTURE_PATH = "/textures/";
+	public static final String ROBOT_IMAGES_PATH = "/RobotImages/";
 	public static final String STRUCTURE_PATH = "/structures/";
 	public static final String SOUND_PATH = "sounds/";
 	

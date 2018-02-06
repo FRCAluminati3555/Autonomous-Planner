@@ -39,7 +39,7 @@ public class TurnToAction extends Action {
 	public void update(float delta) {
 		robot.rotate(step * delta);
 		
-		if(Util.withinRange(robot.getPosAngle(), targetAngle, 3))
+		if(Util.withinRange(robot.getPosAngle(), targetAngle, 1))
 			complete = true;
 	}
 }

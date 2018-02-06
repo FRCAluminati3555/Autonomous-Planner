@@ -69,8 +69,6 @@ public class Robot extends Entity {
 		distanceBetweenWheels = 5;
 		spawn();
 		
-		edit = true;
-		
 		Font font = Font.loadFont(RenderTester.class.getResourceAsStream("/Consolas.qFnt"));
 		
 		text = TextMeshStitcher.createMesh(String.valueOf(teamNumber), 
@@ -82,6 +80,7 @@ public class Robot extends Entity {
 	public void spawn() { 
 		setAngle(90);
 		setPosition2D(spawn);
+//		edit = true;
 	}
 	
 	public void start() {
@@ -100,35 +99,35 @@ public class Robot extends Entity {
 	public void update(float delta) {
 		actionQueue.update(delta);
 
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RIGHT)) {
-			listIndex++;
-			
-			if(listIndex == 4)
-				listIndex = 0;
-			
-			if(listIndex == 0)
-				verticies = ll;
-			else if(listIndex == 1)
-				verticies = lr;
-			else if(listIndex == 2)
-				verticies = rl;
-			else
-				verticies = rr;
-		} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_LEFT)) {
-			listIndex--;
-			
-			if(listIndex == -1)
-				listIndex = 3;
-			
-			if(listIndex == 0)
-				verticies = ll;
-			else if(listIndex == 1)
-				verticies = lr;
-			else if(listIndex == 2)
-				verticies = rl;
-			else
-				verticies = rr;
-		}
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RIGHT)) {
+//			listIndex++;
+//			
+//			if(listIndex == 4)
+//				listIndex = 0;
+//			
+//			if(listIndex == 0)
+//				verticies = ll;
+//			else if(listIndex == 1)
+//				verticies = lr;
+//			else if(listIndex == 2)
+//				verticies = rl;
+//			else
+//				verticies = rr;
+//		} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_LEFT)) {
+//			listIndex--;
+//			
+//			if(listIndex == -1)
+//				listIndex = 3;
+//			
+//			if(listIndex == 0)
+//				verticies = ll;
+//			else if(listIndex == 1)
+//				verticies = lr;
+//			else if(listIndex == 2)
+//				verticies = rl;
+//			else
+//				verticies = rr;
+//		}
 		
 		if(edit) {
 			if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DELETE)) {
@@ -218,6 +217,17 @@ public class Robot extends Entity {
 				}
 			}
 		}
+	}
+	
+	public void setGameData(int index) {
+		if(index == 0)
+			verticies = rr;
+		else if(index == 1)
+			verticies = ll;
+		else if(index == 2)
+			verticies = lr;
+		else 
+			verticies = rl;
 	}
 	
 	private void drawLine(Vector2f from, Vector2f to) {

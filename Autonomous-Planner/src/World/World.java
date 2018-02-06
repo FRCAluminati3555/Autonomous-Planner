@@ -18,6 +18,7 @@ import Input.CameraMovement;
 import Main.Assets;
 import Main.Game;
 import Main.Handler;
+import UI.Frame;
 import World.Tiles.Render.TileInstanceModel;
 
 public class World {
@@ -30,6 +31,8 @@ public class World {
 	private Field field;
 
 	private Robot[] robots;
+	
+	private Frame frame;
 	
 	public World(Handler handler) {
 		this.handler = handler;
@@ -52,6 +55,8 @@ public class World {
 		robots[0] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(40, 155), new Vector3f(0, 0, 1), 5, 3555);
 		robots[1] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(70, 155), new Vector3f(0, 1, 0), 5, 1729);
 		robots[2] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(10, 155), new Vector3f(1, 0, 0), 5, 1010);
+		
+		frame = new Frame(this);
 		
 		place(new Switch(handler, field), new Vector2f(22, 128));
 //		r3555.addAction(new MoveToAction(handler, r3555, new Vector2f(20, 150)));
@@ -95,35 +100,35 @@ public class World {
 	public void update(float delta) {
 		cameraMovement.update(delta);
 
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_UP)) {
-			for(Robot robot : robots)
-				robot.start();
-		}
-		
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DOWN)) {
-			for(Robot robot : robots) {
-				robot.stop();
-				robot.spawn();
-			}
-		}
-		
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD1)) {
-			robots[0].edit();
-			robots[1].disableEdit();
-			robots[2].disableEdit();
-		}
-		
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD2)) {
-			robots[1].edit();
-			robots[0].disableEdit();
-			robots[2].disableEdit();
-		}
-		
-		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD3)) {
-			robots[2].edit();
-			robots[0].disableEdit();
-			robots[1].disableEdit();
-		}
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_UP)) {
+//			for(Robot robot : robots)
+//				robot.start();
+//		}
+//		
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DOWN)) {
+//			for(Robot robot : robots) {
+//				robot.stop();
+//				robot.spawn();
+//			}
+//		}
+//		
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD1)) {
+//			robots[0].edit();
+//			robots[1].disableEdit();
+//			robots[2].disableEdit();
+//		}
+//		
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD2)) {
+//			robots[1].edit();
+//			robots[0].disableEdit();
+//			robots[2].disableEdit();
+//		}
+//		
+//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD3)) {
+//			robots[2].edit();
+//			robots[0].disableEdit();
+//			robots[1].disableEdit();
+//		}
 		
 		for(Robot robot : robots)
 			robot.update(delta);
@@ -142,6 +147,8 @@ public class World {
 		TileInstanceModel.TILE_SHADER.bind();
 		TileInstanceModel.TILE_SHADER.loadLights(sun);
 	}
+	
+	public Robot[] getRobots() { return robots; }
 	
 	public Field getField() { return field; }
 	
