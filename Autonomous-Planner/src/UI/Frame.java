@@ -2,12 +2,13 @@ package UI;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.ScrollPane;
+import java.io.FileNotFoundException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import Utils.InformationUtil;
 import World.World;
 
 public class Frame extends JFrame {
@@ -18,6 +19,8 @@ public class Frame extends JFrame {
 	
 	public Frame(World world) {
 		super();
+		
+		this.world = world;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400, 600);
@@ -30,15 +33,18 @@ public class Frame extends JFrame {
 		scroll.setName(config.getName());
 		addRobotPanel(config);
 		
-		addRobotPanel("Aluminati", "Danky Kang", 3555, 
-				"This is the 3555 Aluminati robot. It does a lotta lotta lotta lotta lotta lotta lotta lotta lotta lotta lotta lotta lotta stuff");
-
+		try {
+			InformationUtil.readInformation(this);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 		setResizable(false);
 		setVisible(true);
 	}
 	
 	public void addRobotPanel(String teamName, String robotName, int teamNumber, String description) {
-		RobotPanel panel = new RobotPanel(teamName, robotName, teamNumber, description);
+		RobotPanel panel = new RobotPanel(world, teamName, robotName, teamNumber, description);
 		JScrollPane pane = new JScrollPane(panel);
 		pane.setName(panel.getName());
 		

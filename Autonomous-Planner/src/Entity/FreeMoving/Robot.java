@@ -1,5 +1,6 @@
 package Entity.FreeMoving;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -21,6 +22,7 @@ import Entity.FreeMoving.AI.Action.Human.MoveToAction;
 import Entity.WrapperBodies.WrapperModel;
 import Input.MousePicker;
 import Main.Handler;
+import Utils.InformationUtil;
 import Utils.Util;
 
 public class Robot extends Entity {
@@ -35,7 +37,6 @@ public class Robot extends Entity {
 	
 	private boolean edit;
 	
-	private int listIndex;
 	private int vectorEditIndex;
 	
 	private ArrayList<Vector2f> rl;
@@ -75,6 +76,8 @@ public class Robot extends Entity {
 				font, 40, handler.getWindow().getAspectRatio(), new Vector2f(-1));
 		text.setShader(Font.BillboardShader);
 		textProperties = new TextRenderProperties(new Transform(new Vector3f(), new Vector3f(), new Vector3f(1)), new Vector4f(1, 1, 1, 1));
+		
+		InformationUtil.readPath(this);
 	}
 	
 	public void spawn() { 
@@ -190,9 +193,7 @@ public class Robot extends Entity {
 					if(Math.abs(anchor.x - position.x) > Math.abs(anchor.y - position.y)) {
 						if(position.getX() < + handler.getWorld().getField().getWidth() && position.x > 0)
 							position.y = anchor.y;
-	//						dragList.fill(WorldObjectDragList.AXIS.X_AXIS, new Vector2f(s.x, s.z));
 					} else if(position.y < handler.getWorld().getField().getHeight() && position.y > 0)
-	//						dragList.fill(WorldObjectDragList.AXIS.Z_AXIS, new Vector2f(s.x, s.z));
 							position.x = anchor.x;
 				}
 				
@@ -268,7 +269,15 @@ public class Robot extends Entity {
 //		push(translate.multiply(1, -1), delta);
 //	}
 	
+	
+	
 	public void edit() { this.edit = true; }
+	
+	public ArrayList<Vector2f> getRl() { return rl; }
+	public ArrayList<Vector2f> getLr() { return lr; }
+	public ArrayList<Vector2f> getRr() { return rr; }
+	public ArrayList<Vector2f> getLl() { return ll; }
+
 	public void disableEdit() { this.edit = false; }
 	
 	public float getDistanceBetweenWheels() { return distanceBetweenWheels; }

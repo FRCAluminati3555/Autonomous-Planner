@@ -7,27 +7,39 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import Entity.FreeMoving.Robot;
 import Utils.AssetLoader;
+import Utils.InformationUtil;
+import World.World;
+import javax.swing.JButton;
 
 public class RobotPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private int teamNumber;
 	
-	public RobotPanel(String teamName, String robotName, int teamNumber, String description) {
+	private JTextArea robotNameField;
+	private JTextArea teamNameField;
+	private JTextArea teamNumberField;
+	private JTextArea descriptionField;
+	
+	private World world;
+	
+	public RobotPanel(World world, String teamName, String robotName, int teamNumber, String description) {
 		super();
 
 		this.teamNumber = teamNumber;
+		this.world = world;
 		
 		setName(Integer.toString(teamNumber));
 		setLayout(new BorderLayout(0, 0));
@@ -47,9 +59,9 @@ public class RobotPanel extends JPanel {
 		UpperInformationPanel.add(InformationPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_InformationPanel = new GridBagLayout();
 		gbl_InformationPanel.columnWidths = new int[]{1, 0, 0, 0, 0};
-		gbl_InformationPanel.rowHeights = new int[]{1, 0, 0, 0, 0};
+		gbl_InformationPanel.rowHeights = new int[]{1, 0, 0, 0, 0, 0};
 		gbl_InformationPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_InformationPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_InformationPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		InformationPanel.setLayout(gbl_InformationPanel);
 		
 		JLabel teamNumberIdentifier = new JLabel("Team Number: ");
@@ -61,14 +73,14 @@ public class RobotPanel extends JPanel {
 		gbc_teamNumberIdentifier.gridy = 0;
 		InformationPanel.add(teamNumberIdentifier, gbc_teamNumberIdentifier);
 		
-		JLabel teamNumberLabel = new JLabel(getName());
-		teamNumberLabel.setFont(new Font("Consolas", Font.PLAIN, 20));
+		teamNumberField = new JTextArea(getName());
+		teamNumberField.setFont(new Font("Consolas", Font.PLAIN, 20));
 		GridBagConstraints gbc_teamNumber = new GridBagConstraints();
 		gbc_teamNumber.anchor = GridBagConstraints.WEST;
 		gbc_teamNumber.insets = new Insets(0, 0, 5, 5);
 		gbc_teamNumber.gridx = 1;
 		gbc_teamNumber.gridy = 0;
-		InformationPanel.add(teamNumberLabel, gbc_teamNumber);
+		InformationPanel.add(teamNumberField, gbc_teamNumber);
 		
 		JLabel teamNameIdentifier = new JLabel("Team Name: ");
 		teamNameIdentifier.setFont(new Font("Consolas", Font.PLAIN, 20));
@@ -79,14 +91,14 @@ public class RobotPanel extends JPanel {
 		gbc_teamNameIdentifier.gridy = 1;
 		InformationPanel.add(teamNameIdentifier, gbc_teamNameIdentifier);
 		
-		JLabel teamNameLabel = new JLabel(teamName);
-		teamNameLabel.setFont(new Font("Consolas", Font.PLAIN, 20));
+		teamNameField = new JTextArea(teamName);
+		teamNameField.setFont(new Font("Consolas", Font.PLAIN, 20));
 		GridBagConstraints gbc_teamNameLabel = new GridBagConstraints();
 		gbc_teamNameLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_teamNameLabel.anchor = GridBagConstraints.WEST;
 		gbc_teamNameLabel.gridx = 1;
 		gbc_teamNameLabel.gridy = 1;
-		InformationPanel.add(teamNameLabel, gbc_teamNameLabel);
+		InformationPanel.add(teamNameField, gbc_teamNameLabel);
 		
 		JLabel robotNameIdentifier = new JLabel("Robot Name: ");
 		robotNameIdentifier.setFont(new Font("Consolas", Font.PLAIN, 20));
@@ -97,30 +109,90 @@ public class RobotPanel extends JPanel {
 		gbc_robotNameIdentifier.gridy = 2;
 		InformationPanel.add(robotNameIdentifier, gbc_robotNameIdentifier);
 		
-		JLabel robotNameLabel = new JLabel(robotName);
-		robotNameLabel.setFont(new Font("Consolas", Font.PLAIN, 20));
+		robotNameField = new JTextArea(robotName);
+		robotNameField.setFont(new Font("Consolas", Font.PLAIN, 20));
 		GridBagConstraints gbc_robotNameLabel = new GridBagConstraints();
 		gbc_robotNameLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_robotNameLabel.anchor = GridBagConstraints.WEST;
 		gbc_robotNameLabel.gridx = 1;
 		gbc_robotNameLabel.gridy = 2;
-		InformationPanel.add(robotNameLabel, gbc_robotNameLabel);
+		InformationPanel.add(robotNameField, gbc_robotNameLabel);
+		
+		JButton btnSaveInformation = new JButton("Save Information");
+		btnSaveInformation.setFont(new Font("Calibri", Font.PLAIN, 14));
+		GridBagConstraints gbc_btnSaveInformation = new GridBagConstraints();
+		gbc_btnSaveInformation.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSaveInformation.gridx = 0;
+		gbc_btnSaveInformation.gridy = 3;
+		InformationPanel.add(btnSaveInformation, gbc_btnSaveInformation);
+		
+		btnSaveInformation.addActionListener(e -> {
+			saveInformation();
+		});
+		
+		JButton btnSavePathData = new JButton("Save Path Data");
+		btnSavePathData.setFont(new Font("Calibri", Font.PLAIN, 14));
+		GridBagConstraints gbc_btnSavePathData = new GridBagConstraints();
+		gbc_btnSavePathData.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSavePathData.gridx = 1;
+		gbc_btnSavePathData.gridy = 3;
+
+		btnSavePathData.addActionListener(e -> {
+			savePath();
+		});
+		
+		InformationPanel.add(btnSavePathData, gbc_btnSavePathData);
+		
+		JButton btnLoadIntoWorld = new JButton("Load Into World");
+		btnLoadIntoWorld.setFont(new Font("Calibri", Font.PLAIN, 14));
+		GridBagConstraints gbc_btnLoadIntoWorld = new GridBagConstraints();
+		gbc_btnLoadIntoWorld.insets = new Insets(0, 0, 5, 5);
+		gbc_btnLoadIntoWorld.gridx = 2;
+		gbc_btnLoadIntoWorld.gridy = 3;
+		InformationPanel.add(btnLoadIntoWorld, gbc_btnLoadIntoWorld);
+		
+		btnLoadIntoWorld.addActionListener(e -> {
+			loadIntoWorld();
+		});
 		
 		JLabel descriptionIdentifier = new JLabel("Description: ");
 		descriptionIdentifier.setFont(new Font("Consolas", Font.PLAIN, 20));
 		GridBagConstraints gbc_descriptionIdentifier = new GridBagConstraints();
 		gbc_descriptionIdentifier.insets = new Insets(0, 0, 0, 5);
 		gbc_descriptionIdentifier.gridx = 0;
-		gbc_descriptionIdentifier.gridy = 3;
+		gbc_descriptionIdentifier.gridy = 4;
 		InformationPanel.add(descriptionIdentifier, gbc_descriptionIdentifier);
 		
-		JTextArea descriptionArea = new JTextArea();
-		descriptionArea.setWrapStyleWord(true);
-		descriptionArea.setFont(new Font("Calibri", Font.PLAIN, 18));
-		descriptionArea.setLineWrap(true);
-		descriptionArea.setText(description);
-		descriptionArea.setEditable(false);
-		add(descriptionArea, BorderLayout.CENTER);
+		descriptionField = new JTextArea();
+		descriptionField.setWrapStyleWord(true);
+		descriptionField.setFont(new Font("Calibri", Font.PLAIN, 18));
+		descriptionField.setLineWrap(true);
+		descriptionField.setText(description);
+//		descriptionArea.setEditable(false);
+		add(descriptionField, BorderLayout.CENTER);
+	}
+	
+	private void saveInformation() {
+		teamNumber = Integer.parseInt(teamNumberField.getText());
+		
+		InformationUtil.exportInformation(this);
+	}
+	
+	private void savePath() {
+		teamNumber = Integer.parseInt(teamNumberField.getText());
+		
+		for(Robot robot : world.getRobots()) {
+			if(robot.getTeamNumber() == teamNumber) {
+				InformationUtil.exportPath(robot);
+				break; 
+			}
+		}
+	}
+	 
+	private void loadIntoWorld() {
+		teamNumber = Integer.parseInt(teamNumberField.getText());
+		
+		
 	}
 	
 	private Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
@@ -162,4 +234,9 @@ public class RobotPanel extends JPanel {
         g2.dispose();
         return new ImageIcon(dst);
 	}
+
+	public JTextArea getRobotNameField() { return robotNameField; }
+	public JTextArea getTeamNameField() { return teamNameField; }
+	public JTextArea getTeamNumberField() { return teamNumberField; }
+	public JTextArea getDescriptionField() { return descriptionField; }
 }
