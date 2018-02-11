@@ -109,7 +109,15 @@ public class InformationUtil {
 				currentList = robot.getRl();
 			else if(line.equals("lr"))
 				currentList = robot.getLr();
-			else {
+			else if(currentList == null) {//spawn location
+				String[] values = line.split(" ");
+				
+				if(values.length == 2) {
+					Vector2f location = new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
+					robot.setSpawn(location.subtract(robot.getDimensions().divide(2)));
+					robot.setPosition2D(location.subtract(robot.getDimensions().divide(2)));
+				}
+			} else {
 				String[] values = line.split(" ");
 				
 				if(values.length == 2)
@@ -147,6 +155,8 @@ public class InformationUtil {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		writer.println(robot.getSpawn().x + " " + robot.getSpawn().y);
 		
 		writer.println("rr");
 		for(Vector2f vector : robot.getRr())

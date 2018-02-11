@@ -178,8 +178,10 @@ public class Robot extends Entity {
 							vectorEditIndex = verticies.indexOf(shortest);
 						}
 					}
-				} else 
+				} else {
 					vectorEditIndex = -1;
+					spawn = getPosition2D();
+				}
 			} else if(vectorEditIndex == -2) {//Move Robot
 				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
 				setX(position.x);
@@ -272,7 +274,8 @@ public class Robot extends Entity {
 //		push(translate.multiply(1, -1), delta);
 //	}
 	
-	
+	public Vector2f getSpawn() { return spawn; }
+	public void setSpawn(Vector2f spwan) { this.spawn = spwan; }
 	
 	public void edit() { this.edit = true; }
 	
