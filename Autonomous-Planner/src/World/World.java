@@ -2,8 +2,6 @@ package World;
 
 import java.util.ArrayList;
 
-import org.lwjgl.input.Keyboard;
-
 import com.Engine.PhysicsEngine.Render.Vector.VectorModel;
 import com.Engine.RenderEngine.Lights.Light;
 import com.Engine.RenderEngine.Util.Camera;
@@ -18,7 +16,6 @@ import Input.CameraMovement;
 import Main.Assets;
 import Main.Game;
 import Main.Handler;
-import UI.Frame;
 import World.Tiles.Render.TileInstanceModel;
 
 public class World {
@@ -32,7 +29,9 @@ public class World {
 
 	private Robot[] robots;
 	
-	private Frame frame;
+	private int replaceIndex;
+	private int replaceTeamNumber;
+	private float replaceX;
 	
 	public World(Handler handler) {
 		this.handler = handler;
@@ -52,28 +51,12 @@ public class World {
 		
 		robots = new Robot[3];
 		
-		robots[0] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(40, 155), new Vector3f(0, 0, 1), 5, 3555);
-		robots[1] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(70, 155), new Vector3f(0, 1, 0), 5, 1729);
-		robots[2] = new Robot(handler, Assets.r3555Model, Assets.r3555Texture, new Vector2f(10, 155), new Vector3f(1, 0, 0), 5, 1010);
-		
-		frame = new Frame(this);
+//		robots[0] = new Robot(handler, 3555, 40);
+//		robots[1] = new Robot(handler, 1729, 70);
+//		robots[2] = new Robot(handler, 1010, 10);
 		
 		place(new Switch(handler, field), new Vector2f(22, 128));
-//		r3555.addAction(new MoveToAction(handler, r3555, new Vector2f(20, 150)));
-		
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f()));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f(82, 0)));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f(82, 164)));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f(0, 164)));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f(82, 164)));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f(82, 0)));
-//		r3555.addAction(new WaitAction(handler, 3));
-//		r3555.addAction(new TurnToAction(handler, r3555, new Vector2f()));
+		replaceIndex = -1;
 	}
 	
 	public boolean place(WorldObject object, Vector3f position, float angle) {
@@ -92,46 +75,22 @@ public class World {
 	}
 	
 	public void drawLine(Vector3f from, Vector3f to, Vector3f color) {
-//		System.out.println("From: " + from + ", To: " + to);
-		
 		VectorModel.renderVector(to.subtract(from).multiply(-1, 1, -1), from, color);
 	}
 	
 	public void update(float delta) {
 		cameraMovement.update(delta);
 
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_UP)) {
-//			for(Robot robot : robots)
-//				robot.start();
-//		}
-//		
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DOWN)) {
-//			for(Robot robot : robots) {
-//				robot.stop();
-//				robot.spawn();
-//			}
-//		}
-//		
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD1)) {
-//			robots[0].edit();
-//			robots[1].disableEdit();
-//			robots[2].disableEdit();
-//		}
-//		
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD2)) {
-//			robots[1].edit();
-//			robots[0].disableEdit();
-//			robots[2].disableEdit();
-//		}
-//		
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_NUMPAD3)) {
-//			robots[2].edit();
-//			robots[0].disableEdit();
-//			robots[1].disableEdit();
-//		}
+		if(replaceIndex != -1) {//Need to make the robot on the OpenGL thread, not the Swing / AWT Thread
+			robots[replaceIndex] = new Robot(handler, replaceTeamNumber, replaceX);
+			handler.getFrame().updateRobotNumbers(replaceTeamNumber);
+			replaceIndex = -1;
+		}
 		
-		for(Robot robot : robots)
-			robot.update(delta);
+		for(Robot robot : robots) {
+			if(robot != null)
+				robot.update(delta);
+		}
 		
 		field.update(delta);
 	}
@@ -139,13 +98,22 @@ public class World {
 	public void render() {
 		field.render();
 		
-		for(Robot robot : robots)
-			robot.render();
+		for(Robot robot : robots) {
+			if(robot != null)
+				robot.render();
+		}
 		
 		Assets.defaultShader.bind();
 		Assets.defaultShader.loadLights(sun);
 		TileInstanceModel.TILE_SHADER.bind();
 		TileInstanceModel.TILE_SHADER.loadLights(sun);
+	}
+	
+	public void replaceRobot(int index, int teamNumber, float x) {
+//		robots[index] = new Robot(handler, teamNumber, x);
+		this.replaceIndex = index;
+		this.replaceTeamNumber = teamNumber;
+		this.replaceX = x;
 	}
 	
 	public Robot[] getRobots() { return robots; }

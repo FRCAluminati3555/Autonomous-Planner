@@ -51,11 +51,16 @@ public abstract class Entity {
 	
 	public Vector2f getPosition2D() { return body.getPosition2D(); }
 	public Vector3f getPosition3D() { return body.getPosition3D(); }
+	
+	public Vector2f getDimensions() { return body.getDimensions(); }
 	public float getWidth() { return body.getWidth(); }
 	public float getHeight() { return body.getHeight(); }
 	
 	public void setPosition2D(Vector2f position) { body.setPosition2D(position.add(getWidth() / 2, getHeight() / 2)); }
 	public void setPosition2D(float x, float z) { setPosition2D(new Vector2f(x, z)); }
+	
+	public void setX(float x) { body.setX(x + (getWidth() / 2)); }
+	public void setZ(float z) { body.setZ(z + (getHeight() / 2)); }
 	
 	public void setPosition3D(Vector3f position) { body.setPosition3D(position.add(getWidth() / 2, 0, getHeight() / 2)); }
 	

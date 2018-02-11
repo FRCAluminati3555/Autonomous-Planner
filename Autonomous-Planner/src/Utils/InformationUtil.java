@@ -51,7 +51,7 @@ public class InformationUtil {
 	}
 	
 	public static void exportInformation(RobotPanel panel) {
-		String teamNumber = panel.getTeamNumberField().getText();
+		int teamNumber = panel.getTeamNumber();
 		String teamName = panel.getTeamNameField().getText();
 		String robotName = panel.getRobotNameField().getText();
 		String description = panel.getDescriptionField().getText();
@@ -59,22 +59,18 @@ public class InformationUtil {
 		File directory = new File("res/Information/" + teamNumber);
 		
 		if(!directory.exists()) {
-			try {
-				directory.createNewFile();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			directory.mkdir();
 		}
 		
-		File file = new File("res/Information/" + teamNumber + "/r" + teamNumber + ".path");
+		File file = new File("res/Information/" + teamNumber + "/r" + teamNumber + ".info");
 		
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				return;
-			}
-		}
+//		if(!file.exists()) {
+//			try {
+//				file.createNewFile();
+//			} catch (IOException e) {
+//				return;
+//			}
+//		}
 		
 		PrintWriter writer = null;
 		try {

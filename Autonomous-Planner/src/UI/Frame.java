@@ -8,27 +8,29 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import Main.Handler;
 import Utils.InformationUtil;
-import World.World;
 
 public class Frame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
-	private World world;
 	private JTabbedPane tabbedPane;
+	private Handler handler;
 	
-	public Frame(World world) {
+	private ConfigPanel config;
+	
+	public Frame(Handler handler) {
 		super();
 		
-		this.world = world;
-		
+		this.handler = handler;
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400, 600);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-		ConfigPanel config = new ConfigPanel(world);
+		config = new ConfigPanel(this, handler);
 		JScrollPane scroll = new JScrollPane(config);
 		scroll.setName(config.getName());
 		addRobotPanel(config);
@@ -44,11 +46,15 @@ public class Frame extends JFrame {
 	}
 	
 	public void addRobotPanel(String teamName, String robotName, int teamNumber, String description) {
-		RobotPanel panel = new RobotPanel(world, teamName, robotName, teamNumber, description);
+		RobotPanel panel = new RobotPanel(handler, teamName, robotName, teamNumber, description);
 		JScrollPane pane = new JScrollPane(panel);
 		pane.setName(panel.getName());
 		
 		addRobotPanel(pane);
+	}
+	
+	public void updateRobotNumbers(int teamNumber) {
+		config.updateTeamNumbers(teamNumber);
 	}
 	
 	public void addRobotPanel(Component comp) {

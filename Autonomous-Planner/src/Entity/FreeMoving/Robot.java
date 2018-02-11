@@ -1,6 +1,5 @@
 package Entity.FreeMoving;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -12,15 +11,14 @@ import com.Engine.RenderEngine.Font.Font;
 import com.Engine.RenderEngine.Font.TextMeshStitcher;
 import com.Engine.RenderEngine.Font.Render.TextMesh;
 import com.Engine.RenderEngine.Font.Render.TextRenderProperties;
-import com.Engine.RenderEngine.Textures.Texture2D;
 import com.Engine.RenderEngine.Util.RenderStructs.Transform;
 import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 import com.Engine.Util.Vectors.Vector4f;
 
 import Entity.FreeMoving.AI.Action.Human.MoveToAction;
-import Entity.WrapperBodies.WrapperModel;
 import Input.MousePicker;
+import Main.Assets;
 import Main.Handler;
 import Utils.InformationUtil;
 import Utils.Util;
@@ -36,6 +34,7 @@ public class Robot extends Entity {
 	private float distanceBetweenWheels;
 	
 	private boolean edit;
+	private boolean moveToMouse;
 	
 	private int vectorEditIndex;
 	
@@ -50,13 +49,14 @@ public class Robot extends Entity {
 	private Vector2f spawn;
 	private Vector3f color;
 	
-	public Robot(Handler handler, WrapperModel wrapperModel, Texture2D texture, Vector2f spawn, Vector3f color, float movementSpeed, int teamNumber) {
-		super(handler, wrapperModel, texture);
+	public Robot(Handler handler, int teamNumber, float x) {
+		super(handler, Assets.getModel(teamNumber), Assets.getTexture(teamNumber));
 		
-		this.spawn = spawn;
+		this.spawn = new Vector2f(x, handler.getWorld().getField().getHeight() - getHeight());
 		this.teamNumber = teamNumber;
-		this.movementSpeed = new Vector2f(movementSpeed);
-		this.color = color;
+		this.movementSpeed = new Vector2f(Assets.getSpeed(teamNumber));
+		this.distanceBetweenWheels = Assets.getDistanceBetweenWheels(teamNumber);
+		this.color = Vector3f.random(1);
 
 		vectorEditIndex = -1;
 
@@ -67,13 +67,9 @@ public class Robot extends Entity {
 		
 		verticies = rr;
 		
-		distanceBetweenWheels = 5;
 		spawn();
 		
-		Font font = Font.loadFont(RenderTester.class.getResourceAsStream("/Consolas.qFnt"));
-		
-		text = TextMeshStitcher.createMesh(String.valueOf(teamNumber), 
-				font, 40, handler.getWindow().getAspectRatio(), new Vector2f(-1));
+		text = Assets.generateTextMesh(Integer.toString(teamNumber), handler.getWindow());
 		text.setShader(Font.BillboardShader);
 		textProperties = new TextRenderProperties(new Transform(new Vector3f(), new Vector3f(), new Vector3f(1)), new Vector4f(1, 1, 1, 1));
 		
@@ -154,33 +150,40 @@ public class Robot extends Entity {
 			} else if(handler.getMouseManager().keyJustReleased(1)) {
 				if(vectorEditIndex == -1) {
 					Vector2f hit = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
-					HashMap<Float, Vector2f> distances = new HashMap<>();
-					
-					for(Vector2f vector : verticies) {
-						float distance = vector.distance(hit);
-						if(distance < 2)
-							distances.put(distance, vector);
-					}
-					
-					Set<Float> list = distances.keySet();
-					if(list.size() == 0)
-						return;
-					if(list.size() > 1) {
-						float distance = Float.MAX_VALUE;
-						for(Float f : list) {
-							if(f < distance)
-								distance = f;
+
+					if(hit.distance(getPosition2D()) < getDimensions().length() / 2f) {//Click On Robot
+						vectorEditIndex = -2;
+					} else {
+						HashMap<Float, Vector2f> distances = new HashMap<>();
+						
+						for(Vector2f vector : verticies) {
+							float distance = vector.distance(hit);
+							if(distance < 2)
+								distances.put(distance, vector);
 						}
 						
-						vectorEditIndex = verticies.indexOf((distances.get(distance)));
-					} else {
-						Vector2f shortest = distances.get(list.iterator().next());
-						vectorEditIndex = verticies.indexOf(shortest);
+						Set<Float> list = distances.keySet();
+						if(list.size() == 0)
+							return;
+						if(list.size() > 1) {
+							float distance = Float.MAX_VALUE;
+							for(Float f : list) {
+								if(f < distance)
+									distance = f;
+							}
+							
+							vectorEditIndex = verticies.indexOf((distances.get(distance)));
+						} else {
+							Vector2f shortest = distances.get(list.iterator().next());
+							vectorEditIndex = verticies.indexOf(shortest);
+						}
 					}
 				} else 
 					vectorEditIndex = -1;
+			} else if(vectorEditIndex == -2) {//Move Robot
+				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
+				setX(position.x);
 			} else if(vectorEditIndex != -1) {
-				
 				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
 				
 				if(Keyboard.isKeyDown(Keyboard.KEY_F)) {
@@ -210,7 +213,7 @@ public class Robot extends Entity {
 		text.render(textProperties);
 		
 		if(verticies.size() > 0) {
-			drawLine(spawn.add(getWidth() / 2, getHeight() / 2), verticies.get(0));
+			drawLine(getPosition2D(), verticies.get(0));
 			
 			if(verticies.size() > 1) {
 				for(int i = 0; i < verticies.size() - 1; i++) {

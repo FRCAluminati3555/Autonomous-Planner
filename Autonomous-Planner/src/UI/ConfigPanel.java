@@ -10,8 +10,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import Entity.FreeMoving.Robot;
+import Main.Handler;
 import World.World;
 
 public class ConfigPanel extends JPanel {
@@ -21,9 +23,10 @@ public class ConfigPanel extends JPanel {
 	private Robot[] robots;
 	
 	private JRadioButton robot0, robot1, robot2;
+	private JTextField robotNumberField;
 	
-	public ConfigPanel(World world) {
-		this.world = world;
+	public ConfigPanel(Frame frame, Handler handler) {
+		this.world = handler.getWorld();
 		this.robots = world.getRobots();
 		
 		setName("Configuration");
@@ -34,10 +37,10 @@ public class ConfigPanel extends JPanel {
 //		JPanel configPanel = new JPanel();
 //		configPane.setViewportView(configPanel);
 		GridBagLayout gbl_configPanel = new GridBagLayout();
-		gbl_configPanel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_configPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_configPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_configPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_configPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
+		gbl_configPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_configPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_configPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gbl_configPanel);
 		
 		JLabel gameDataIdentifier = new JLabel("Game Data");
@@ -64,6 +67,14 @@ public class ConfigPanel extends JPanel {
 		gbc_rdbtnNewRadioButton_2.gridy = 1;
 		add(rr, gbc_rdbtnNewRadioButton_2);
 		
+		JButton btnAddRobot = new JButton("Add Robot");
+		btnAddRobot.setFont(new Font("Calibri", Font.PLAIN, 20));
+		GridBagConstraints gbc_btnAddRobot = new GridBagConstraints();
+		gbc_btnAddRobot.insets = new Insets(0, 0, 5, 0);
+		gbc_btnAddRobot.gridx = 3;
+		gbc_btnAddRobot.gridy = 1;
+		add(btnAddRobot, gbc_btnAddRobot);
+		
 		JRadioButton lr = new JRadioButton("LR");
 		lr.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbc_rdbtnNewRadioButton_1 = new GridBagConstraints();
@@ -80,6 +91,16 @@ public class ConfigPanel extends JPanel {
 		gbc_rdbtnNewRadioButton_3.gridy = 2;
 		add(ll, gbc_rdbtnNewRadioButton_3);
 		
+		robotNumberField = new JTextField();
+		robotNumberField.setToolTipText("Team Number");
+		GridBagConstraints gbc_robotNumberField = new GridBagConstraints();
+		gbc_robotNumberField.insets = new Insets(0, 0, 5, 0);
+		gbc_robotNumberField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_robotNumberField.gridx = 3;
+		gbc_robotNumberField.gridy = 2;
+		add(robotNumberField, gbc_robotNumberField);
+		robotNumberField.setColumns(10);
+		
 		JLabel lblNewLabel = new JLabel("Actions");
 		lblNewLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
@@ -91,7 +112,7 @@ public class ConfigPanel extends JPanel {
 		JLabel robotLabel = new JLabel("Robots");
 		robotLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbc_robotLabel = new GridBagConstraints();
-		gbc_robotLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_robotLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_robotLabel.gridx = 2;
 		gbc_robotLabel.gridy = 4;
 		add(robotLabel, gbc_robotLabel);
@@ -104,25 +125,26 @@ public class ConfigPanel extends JPanel {
 		gbc_btnStart.gridy = 5;
 		add(btnStart, gbc_btnStart);
 		
-		robot0 = new JRadioButton(Integer.toString(robots[0].getTeamNumber()));
+		robot0 = new JRadioButton(robots[0] == null ? "" : Integer.toString(robots[0].getTeamNumber()));
 		robot0.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbcc_rdbtnNewRadioButton = new GridBagConstraints();
-		gbcc_rdbtnNewRadioButton.insets = new Insets(0, 0, 5, 0);
+		gbcc_rdbtnNewRadioButton.insets = new Insets(0, 0, 5, 5);
 		gbcc_rdbtnNewRadioButton.gridx = 2;
 		gbcc_rdbtnNewRadioButton.gridy = 5;
 		add(robot0, gbcc_rdbtnNewRadioButton);
 		
-		robot1 = new JRadioButton(Integer.toString(robots[1].getTeamNumber()));
+		robot1 = new JRadioButton(robots[1] == null ? "" : Integer.toString(robots[1].getTeamNumber()));
 		robot1.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbcc_rdbtnNewRadioButton_1 = new GridBagConstraints();
-		gbcc_rdbtnNewRadioButton_1.insets = new Insets(0, 0, 5, 0);
+		gbcc_rdbtnNewRadioButton_1.insets = new Insets(0, 0, 5, 5);
 		gbcc_rdbtnNewRadioButton_1.gridx = 2;
 		gbcc_rdbtnNewRadioButton_1.gridy = 6;
 		add(robot1, gbcc_rdbtnNewRadioButton_1);
 		
-		robot2 = new JRadioButton(Integer.toString(robots[2].getTeamNumber()));
+		robot2 = new JRadioButton(robots[2] == null ? "" : Integer.toString(robots[2].getTeamNumber()));
 		robot2.setFont(new Font("Calibri", Font.PLAIN, 20));
 		GridBagConstraints gbcc_rdbtnNewRadioButton_2 = new GridBagConstraints();
+		gbcc_rdbtnNewRadioButton_2.insets = new Insets(0, 0, 5, 5);
 		gbcc_rdbtnNewRadioButton_2.gridx = 2;
 		gbcc_rdbtnNewRadioButton_2.gridy = 7;
 		add(robot2, gbcc_rdbtnNewRadioButton_2);
@@ -160,15 +182,24 @@ public class ConfigPanel extends JPanel {
 		rl.doClick();
 		
 		btnStart.addActionListener(e -> {
-			for(Robot robot : robots)
-				robot.start();
+			for(Robot robot : robots) {
+				if(robot != null)
+					robot.start();
+			}
 		});
 		
 		btnReset.addActionListener(e -> {
 			for(Robot robot : robots) {
-				robot.stop();
-				robot.spawn();
+				if(robot != null) {
+					robot.stop();
+					robot.spawn();
+				}
 			}
+		});
+		
+		btnAddRobot.addActionListener(e -> {
+			int teamNumber = Integer.parseInt(robotNumberField.getText());
+			frame.addRobotPanel("", "", teamNumber, "");
 		});
 		
 		ButtonGroup robotButtons = new ButtonGroup();
@@ -177,38 +208,66 @@ public class ConfigPanel extends JPanel {
 		robotButtons.add(robot2);
 
 		robot0.addActionListener(e -> {
-			robots[0].edit();
-			robots[1].disableEdit();
-			robots[2].disableEdit();
+			if(robots[0] != null)
+				robots[0].edit();
+			if(robots[1] != null)
+				robots[1].disableEdit();
+			if(robots[2] != null)
+				robots[2].disableEdit();
 		});
 		
 		robot1.addActionListener(e -> {
-			robots[1].edit();
-			robots[0].disableEdit();
-			robots[2].disableEdit();
+			if(robots[1] != null)
+				robots[1].edit();
+			if(robots[0] != null)
+				robots[0].disableEdit();
+			if(robots[2] != null)
+				robots[2].disableEdit();
 		});
 		
 		robot2.addActionListener(e -> {
-			robots[2].edit();
-			robots[0].disableEdit();
-			robots[1].disableEdit();
+			if(robots[2] != null)
+				robots[2].edit();
+			if(robots[0] != null)
+				robots[0].disableEdit();
+			if(robots[1] != null)
+				robots[1].disableEdit();
 		});
 		
 		robot0.doClick();
 	}
+	
+	public void updateTeamNumbers(int teamnumber) {
+		if(robots[0] != null) {
+			robot0.setText(Integer.toString(robots[0].getTeamNumber()));
+			if(Integer.parseInt(robot0.getText()) == teamnumber)
+				robot0.doClick();
+		} if(robots[1] != null) {
+			robot1.setText(Integer.toString(robots[1].getTeamNumber()));
+			if(Integer.parseInt(robot1.getText()) == teamnumber)
+				robot1.doClick();
+		}
+		if(robots[2] != null) {
+			robot2.setText(Integer.toString(robots[2].getTeamNumber()));
+			if(Integer.parseInt(robot2.getText()) == teamnumber)
+				robot2.doClick();
+		}
+	}
 
 	private void setGameData(int index) {
 		for(Robot robot : world.getRobots()) {
-			robot.stop();
-			robot.spawn();
-			robot.setGameData(index);
-
-			if(robot0.isSelected())
-				robots[0].edit();
-			else if(robot1.isSelected())
-				robots[1].edit();
-			else if(robot2.isSelected())
-				robots[2].edit();
+			if(robot != null) {
+				robot.stop();
+				robot.spawn();
+				robot.setGameData(index);
+	
+				if(robot0.isSelected())
+					robots[0].edit();
+				else if(robot1.isSelected())
+					robots[1].edit();
+				else if(robot2.isSelected())
+					robots[2].edit();
+			}
 		}
 	}
 }

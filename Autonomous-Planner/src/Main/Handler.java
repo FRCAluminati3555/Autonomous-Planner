@@ -4,6 +4,7 @@ import com.Engine.RenderEngine.Window.Window;
 
 import Input.KeyManager;
 import Input.MouseManager;
+import UI.Frame;
 import World.World;
 
 public class Handler {
@@ -12,6 +13,8 @@ public class Handler {
 	
 	private KeyManager keyManager;
 	private MouseManager mouseManager;
+	
+	private Frame frame;
 	
 	public Handler(Game game) {
 		this.game = game;
@@ -24,8 +27,10 @@ public class Handler {
 		world.init();
 		
 		mouseManager = new MouseManager(this);
+		frame = new Frame(this);
 	}
 	
+	public Frame getFrame() { return frame; }
 	public Game getGame() { return game; }
 	public World getWorld() { return world; }
 	public Window getWindow() { return game.getWindow(); }

@@ -7,21 +7,21 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import Entity.FreeMoving.Robot;
+import Main.Handler;
 import Utils.AssetLoader;
 import Utils.InformationUtil;
 import World.World;
-import javax.swing.JButton;
 
 public class RobotPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -30,16 +30,18 @@ public class RobotPanel extends JPanel {
 	
 	private JTextArea robotNameField;
 	private JTextArea teamNameField;
-	private JTextArea teamNumberField;
+	private JLabel teamNumberField;
 	private JTextArea descriptionField;
 	
+	private Handler handler;
 	private World world;
 	
-	public RobotPanel(World world, String teamName, String robotName, int teamNumber, String description) {
+	public RobotPanel(Handler handler, String teamName, String robotName, int teamNumber, String description) {
 		super();
 
 		this.teamNumber = teamNumber;
-		this.world = world;
+		this.handler = handler;
+		this.world = handler.getWorld();
 		
 		setName(Integer.toString(teamNumber));
 		setLayout(new BorderLayout(0, 0));
@@ -73,7 +75,7 @@ public class RobotPanel extends JPanel {
 		gbc_teamNumberIdentifier.gridy = 0;
 		InformationPanel.add(teamNumberIdentifier, gbc_teamNumberIdentifier);
 		
-		teamNumberField = new JTextArea(getName());
+		teamNumberField = new JLabel(getName());
 		teamNumberField.setFont(new Font("Consolas", Font.PLAIN, 20));
 		GridBagConstraints gbc_teamNumber = new GridBagConstraints();
 		gbc_teamNumber.anchor = GridBagConstraints.WEST;
@@ -91,8 +93,9 @@ public class RobotPanel extends JPanel {
 		gbc_teamNameIdentifier.gridy = 1;
 		InformationPanel.add(teamNameIdentifier, gbc_teamNameIdentifier);
 		
-		teamNameField = new JTextArea(teamName);
+		teamNameField = new JTextArea(teamName != null ? teamName : " ");
 		teamNameField.setFont(new Font("Consolas", Font.PLAIN, 20));
+		teamNameField.setEditable(true);
 		GridBagConstraints gbc_teamNameLabel = new GridBagConstraints();
 		gbc_teamNameLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_teamNameLabel.anchor = GridBagConstraints.WEST;
@@ -109,8 +112,9 @@ public class RobotPanel extends JPanel {
 		gbc_robotNameIdentifier.gridy = 2;
 		InformationPanel.add(robotNameIdentifier, gbc_robotNameIdentifier);
 		
-		robotNameField = new JTextArea(robotName);
+		robotNameField = new JTextArea(robotName != null ? robotName : " ");
 		robotNameField.setFont(new Font("Consolas", Font.PLAIN, 20));
+		robotNameField.setEditable(true);
 		GridBagConstraints gbc_robotNameLabel = new GridBagConstraints();
 		gbc_robotNameLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_robotNameLabel.anchor = GridBagConstraints.WEST;
@@ -173,26 +177,22 @@ public class RobotPanel extends JPanel {
 	}
 	
 	private void saveInformation() {
-		teamNumber = Integer.parseInt(teamNumberField.getText());
-		
 		InformationUtil.exportInformation(this);
 	}
 	
 	private void savePath() {
-		teamNumber = Integer.parseInt(teamNumberField.getText());
-		
 		for(Robot robot : world.getRobots()) {
-			if(robot.getTeamNumber() == teamNumber) {
-				InformationUtil.exportPath(robot);
-				break; 
+			if(robot != null) {
+				if(robot.getTeamNumber() == teamNumber) {
+					InformationUtil.exportPath(robot);
+					break; 
+				}
 			}
 		}
 	}
 	 
 	private void loadIntoWorld() {
-		teamNumber = Integer.parseInt(teamNumberField.getText());
-		
-		
+		new LoadIntoWorldPanel(handler, teamNumber);
 	}
 	
 	private Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
@@ -223,6 +223,10 @@ public class RobotPanel extends JPanel {
 	}
 	
 	private ImageIcon scaleImage(Dimension boundry) {
+		File file = new File(AssetLoader.ROBOT_IMAGES_PATH + teamNumber + ".png");
+		if(!file.exists())
+			return null;
+		
 		BufferedImage src = AssetLoader.loadImage(AssetLoader.ROBOT_IMAGES_PATH + teamNumber + ".png");
 		
 		Dimension dimension = getScaledDimension(new Dimension(src.getWidth(), src.getHeight()), boundry);
@@ -237,6 +241,7 @@ public class RobotPanel extends JPanel {
 
 	public JTextArea getRobotNameField() { return robotNameField; }
 	public JTextArea getTeamNameField() { return teamNameField; }
-	public JTextArea getTeamNumberField() { return teamNumberField; }
 	public JTextArea getDescriptionField() { return descriptionField; }
+	 
+	public int getTeamNumber() { return teamNumber; }
 }

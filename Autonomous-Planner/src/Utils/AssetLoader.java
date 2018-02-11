@@ -18,7 +18,8 @@ public class AssetLoader {
 		try {
 			return ImageIO.read(AssetLoader.class.getResource(path));
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println("No Image found at: " + path);
 		}
 		return null;
 	}
