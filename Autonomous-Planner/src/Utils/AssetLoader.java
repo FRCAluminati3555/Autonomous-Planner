@@ -17,7 +17,7 @@ public class AssetLoader {
 	public static BufferedImage loadImage(String path) {
 		try {
 			return ImageIO.read(AssetLoader.class.getResource(path));
-		} catch (IOException e) {
+		} catch (Exception e) {
 //			e.printStackTrace();
 			System.err.println("No Image found at: " + path);
 		}

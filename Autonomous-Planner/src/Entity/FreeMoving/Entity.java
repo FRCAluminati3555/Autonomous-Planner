@@ -4,8 +4,8 @@ import com.Engine.RenderEngine.Textures.Texture2D;
 import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 
-import Entity.FreeMoving.AI.Action.Action;
-import Entity.FreeMoving.AI.Action.ActionQueue;
+import Entity.FreeMoving.Action.Action;
+import Entity.FreeMoving.Action.ActionQueue;
 import Entity.WrapperBodies.WrapperModel;
 import Entity.WrapperBodies.WrapperStaticBody;
 import Main.Handler;

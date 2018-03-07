@@ -22,6 +22,16 @@ import Main.Handler;
 import Utils.AssetLoader;
 import Utils.InformationUtil;
 import World.World;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+
+import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import java.awt.Component;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JRadioButton;
 
 public class RobotPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -174,6 +184,77 @@ public class RobotPanel extends JPanel {
 		descriptionField.setText(description);
 //		descriptionArea.setEditable(false);
 		add(descriptionField, BorderLayout.CENTER);
+		
+		JPanel actionPanel = new JPanel();
+		add(actionPanel, BorderLayout.SOUTH);
+		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+		
+		Box verticalBox = Box.createVerticalBox();
+		actionPanel.add(verticalBox);
+		
+		JLabel movmentLabel = new JLabel("Movement");
+		movmentLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		movmentLabel.setFont(new Font("Consolas", Font.PLAIN, 20));
+		movmentLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		verticalBox.add(movmentLabel);
+		
+		JPanel spawnLocationPanel = new JPanel();
+		verticalBox.add(spawnLocationPanel);
+		spawnLocationPanel.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane spawnLocationScrollPane = new JScrollPane();
+		spawnLocationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		JLabel spawnLocationScrollLabel = new JLabel("Spawn Locations");
+		spawnLocationScrollLabel.setFont(new Font("Consolas", Font.PLAIN, 16));
+		spawnLocationScrollPane.setColumnHeaderView(spawnLocationScrollLabel);
+		spawnLocationPanel.add(spawnLocationScrollPane);
+		
+		Box spawnsBox = Box.createVerticalBox();
+		spawnsBox.add(new SpwanLocationEditPanel());
+		spawnLocationScrollPane.setViewportView(spawnsBox);
+		
+		JPanel ownershipPanel = new JPanel();
+		verticalBox.add(ownershipPanel);
+		ownershipPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblOwnershipOptions = new JLabel("Ownership Options");
+		lblOwnershipOptions.setHorizontalAlignment(SwingConstants.LEFT);
+		lblOwnershipOptions.setFont(new Font("Consolas", Font.PLAIN, 16));
+		ownershipPanel.add(lblOwnershipOptions, BorderLayout.NORTH);
+		
+		JPanel ownershipButtonPanel = new JPanel();
+		ownershipPanel.add(ownershipButtonPanel, BorderLayout.CENTER);
+		
+		JRadioButton rlBtn = new JRadioButton("RL");
+		ownershipButtonPanel.add(rlBtn);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		ownershipButtonPanel.add(horizontalStrut);
+		
+		JRadioButton lrBtn = new JRadioButton("LR");
+		ownershipButtonPanel.add(lrBtn);
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		ownershipButtonPanel.add(horizontalStrut_1);
+		
+		JRadioButton rrBtn = new JRadioButton("RR");
+		ownershipButtonPanel.add(rrBtn);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		ownershipButtonPanel.add(horizontalStrut_2);
+		
+		JRadioButton llBtn = new JRadioButton("LL");
+		ownershipButtonPanel.add(llBtn);
+		
+		ButtonGroup ownershipGroup = new ButtonGroup();
+		ownershipGroup.add(llBtn);
+		ownershipGroup.add(lrBtn);
+		ownershipGroup.add(rlBtn);
+		ownershipGroup.add(rrBtn);
+		
+		JPanel actionEditPanel = new JPanel();
+		verticalBox.add(actionEditPanel);
 	}
 	
 	private void saveInformation() {
@@ -223,11 +304,14 @@ public class RobotPanel extends JPanel {
 	}
 	
 	private ImageIcon scaleImage(Dimension boundry) {
-		File file = new File(AssetLoader.ROBOT_IMAGES_PATH + teamNumber + ".png");
-		if(!file.exists())
-			return null;
+//		File file = new File(AssetLoader.ROBOT_IMAGES_PATH + teamNumber + ".png");
+//		if(!file.exists()) {
+//			return null;
+//		}
 		
 		BufferedImage src = AssetLoader.loadImage(AssetLoader.ROBOT_IMAGES_PATH + teamNumber + ".png");
+		if(src == null)
+			return null;
 		
 		Dimension dimension = getScaledDimension(new Dimension(src.getWidth(), src.getHeight()), boundry);
 		

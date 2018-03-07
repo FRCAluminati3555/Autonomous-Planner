@@ -1,6 +1,6 @@
-package Entity.FreeMoving.AI.Action.Human;
+package Entity.FreeMoving.Action.Robot;
 
-import Entity.FreeMoving.AI.Action.Action;
+import Entity.FreeMoving.Action.Action;
 import Main.Handler;
 
 public class WaitAction extends Action {

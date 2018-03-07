@@ -1,9 +1,9 @@
-package Entity.FreeMoving.AI.Action.Human;
+package Entity.FreeMoving.Action.Robot;
 
 import com.Engine.Util.Vectors.Vector2f;
 
 import Entity.FreeMoving.Robot;
-import Entity.FreeMoving.AI.Action.MultiAction;
+import Entity.FreeMoving.Action.MultiAction;
 import Main.Handler;
 
 public class MoveToAction extends MultiAction {

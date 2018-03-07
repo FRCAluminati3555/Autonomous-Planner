@@ -16,7 +16,7 @@ import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 import com.Engine.Util.Vectors.Vector4f;
 
-import Entity.FreeMoving.AI.Action.Human.MoveToAction;
+import Entity.FreeMoving.Action.Robot.MoveToAction;
 import Input.MousePicker;
 import Main.Assets;
 import Main.Handler;
@@ -34,7 +34,6 @@ public class Robot extends Entity {
 	private float distanceBetweenWheels;
 	
 	private boolean edit;
-	private boolean moveToMouse;
 	
 	private int vectorEditIndex;
 	
@@ -184,6 +183,8 @@ public class Robot extends Entity {
 				}
 			} else if(vectorEditIndex == -2) {//Move Robot
 				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
+				position = position.capMax(handler.getWorld().getField().getDimensions().x - getWidth(), position.getY());
+				position = position.capMin(0, position.getY());
 				setX(position.x);
 			} else if(vectorEditIndex != -1) {
 				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));

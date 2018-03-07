@@ -1,9 +1,9 @@
-package Entity.FreeMoving.AI.Action.Human;
+package Entity.FreeMoving.Action.Robot;
 
 import com.Engine.Util.Vectors.Vector2f;
 
 import Entity.FreeMoving.Robot;
-import Entity.FreeMoving.AI.Action.Action;
+import Entity.FreeMoving.Action.Action;
 import Main.Handler;
 import Utils.Util;
 

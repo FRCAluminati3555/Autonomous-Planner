@@ -1,4 +1,4 @@
-package Entity.FreeMoving.AI.Action;
+package Entity.FreeMoving.Action;
 
 import Main.Handler;
 

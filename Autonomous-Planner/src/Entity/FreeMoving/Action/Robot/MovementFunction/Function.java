@@ -1,4 +1,4 @@
-package Entity.FreeMoving.AI.Action.Human.MovementFunction;
+package Entity.FreeMoving.Action.Robot.MovementFunction;
 
 import Entity.FreeMoving.Entity;
 
