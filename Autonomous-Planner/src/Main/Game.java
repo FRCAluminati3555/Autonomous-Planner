@@ -43,96 +43,38 @@ public class Game {
 	public static PhysicsShader physicsShader;
 	public static int screenWidth = 800, screenHeight = 600;
 	
-	/** TODO
-	 * Systems: 
-	 * 	✔ Frustrum Culling -> Wrapper Bodies 
-	 * 	✔ Anti Aliasing
-	 * 	✔ Instance rendering tiles -> Textures
-	 * 		- ✔ Each Tile have different texture
-	 * 		- ✔ Implement Into Assets
-	 * 	
-	 *  ✔ Rotation Glitch
-	 *  Simpler Collision Model
+	/** 
+	 * THE PLAN:
+	 * 		- Edit Movement 
+	 * 			- Editable values for distances
+	 * 			- Different Types of Turns
+	 * 			- Different Velocities at each 
+	 * 			- From Center or from front?
 	 * 
-	 * Acutal Game:
-	 * 	Make actual textures for the models
+	 * 			- Pickup / Deposit Cubes   -|
+	 * 			- Wait Function            -| <- Render?
+	 * 												- Different Symbol Models at each Point location with colors
+	 * 		
+	 * 		- Make Positions Changeable (Different Spawn Locations)
+	 * 			- List of spawn locations that are all selectable and generateable <- Add to a scroll pane of radio buttons		
 	 * 
-	 * 	TV effective radius improvments
-	 * 		- Can't watch TV through a wall
-	 * 		- Recursive algorithm can't go into an empty room next to the TV
-	 * 		- Ray Tracing -> Look at mouse picking
-	 * 
-	 * 	Appliances
-	 * 		- ✔ Pick them off of host object
-	 * 		- ✔ update them
-	 * 		- ✔ translate them with the host
-	 * 		- ✔ rotate with host
-	 * 		- host will look at appliances for actions AND needs
-	 * 
-	 * 	Multiple Floors
-	 * 		- Lot can have floor levels that are all at different levels, and have different tiles
-	 * 		- Stairs need to be implemented to get between the different floors
-	 *  
-	 *  Lot to Lot travel 
-	 *  	- Roads will act as a median
-	 *  		- Sidewalk
-	 *  		- Cars
-	 *  			- Traffic system <- Oh Boy that's going to be fun <- Keep that simple
-	 *  
-	 * 	Getting on an object
-	 * 		- Rotate and translate the player to fit (Ex. Bed)
-	 * 		- Animations?
-	 * 
-	 * 	Actions
-	 * 		- Make a meal <- Cooking Skill <- Fridge Class 
-	 * 
-	 * 		- Multiple Actions At Once
-	 * 			- No conflictions
-	 * 				- Can't walk in two different directions at the same time
-	 * 			- Effectiveness
-	 * 				- Homework and TV at the same time results in homework taking longer
-	 * 		- Interupts
-	 * 			- A Very low need level may take priority over the current action, and interupt the current to take care of that low level need
-	 * 		- Re-Order them (Slight UI)
-	 * 			- Be able to reorder the actions by sliding them (UI)
-	 * 		- Timed actions 
-	 * 			- ✔ Food takes time to eat, not an instant
-	 * 			- ✔ Watching TV give entertainment over time
-	 * 		- Synced actions between two entities
-	 * 			- Two people talking
-	 * 			- Back burner action list?
-	 * 		- Within a certian distance (effective radius) -> see TV Effective radius
-	 * 			- Example: walking and talking becomes not possible when the party's involved are far away
-	 * 			- Stop the action when a certain distance away
-	 *		- More models to go with new Actions
-	 * 	
-	 * 	Edit Mode
-	 * 		- ✔ Tile Texture 
-	 * 			- ✔ choosing and setting
-	 * 			- ✔ dragging in a rectangle
-	 * 
-	 * 	Relationships
-	 * 		- Remembering the other people 
-	 * 		- Get to know their skills and traits
-	 * 		- Use traits to determine how much they could get along or dislike each other
-	 * 
-	 * 	Object Inventory
-	 * 		- Render the inventory in some way?
-	 * 		- Each object can have a render method to organize how the inventory can be rendered
-	 * 			- Table can render a certain amount of items, from the inventory, on top of its model
-	 * 
-	 * 	Character Customization
-	 * 		- Separate Models
-	 * 			- Example: Hat, watch, glasses
-	 * 			- Dynamically change the locations of those models based on the coordinates of the player model lie	
-	 * 				- Increased fatness or getting taller or shorter
-	 * 			- Change the textures
-	 * 				- Different color t-shirt
-	 * 			- Add function to wrapper body to add other models, and sync with offset to original model
-	 * 
-	 * 	Sound
-	 * 		Certain actions will play a different sound in the world (World Sounds)
-	 * 		Ambient Sounds (Music, UI Clicking, etc...)
+	 * 		-Different Type Of Actions
+	 * 			- Add Action popup 
+	 * 				- Different Types of actions and properties of those actions
+	 * 			- Editable TextFields for properties for those actions
+	 * 		- Scoring
+	 * 			- Render Score
+	 * 			- Timer -> Score per second
+	 * 			- Pickup and Deposit Cubes <- Another Type Of Action
+	 * 				- Inventory
+	 * 		- Create an interpretable file for robot to read and base auto off of
+	 *		- Make UI Look Nice
+	 *		- Add in the rest of the field
+	 *			- Walls
+	 *			- Scale
+	 *			- Bleachers? 
+	 *				- Little People?
+	 *			- Ref Stands
 	 */
 	public void init() throws LWJGLException {
 		window = new Window();
