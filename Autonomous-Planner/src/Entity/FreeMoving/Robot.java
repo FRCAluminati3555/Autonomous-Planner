@@ -45,13 +45,18 @@ public class Robot extends Entity {
 	//Current
 	private ArrayList<Vector2f> verticies;
 	
-	private Vector2f spawn;
+	private Spawn spawn;
 	private Vector3f color;
 	
-	public Robot(Handler handler, int teamNumber, float x) {
+	private RobotInformationPassThrough robotInfo;
+	
+	public Robot(Handler handler, int teamNumber) {
 		super(handler, Assets.getModel(teamNumber), Assets.getTexture(teamNumber));
 		
-		this.spawn = new Vector2f(x, handler.getWorld().getField().getHeight() - getHeight());
+		robotInfo = handler.getRobotInfo(teamNumber);
+		
+		spawn = robotInfo.getSpawn();
+		
 		this.teamNumber = teamNumber;
 		this.movementSpeed = new Vector2f(Assets.getSpeed(teamNumber));
 		this.distanceBetweenWheels = Assets.getDistanceBetweenWheels(teamNumber);
@@ -72,12 +77,12 @@ public class Robot extends Entity {
 		text.setShader(Font.BillboardShader);
 		textProperties = new TextRenderProperties(new Transform(new Vector3f(), new Vector3f(), new Vector3f(1)), new Vector4f(1, 1, 1, 1));
 		
-		InformationUtil.readPath(this);
+		InformationUtil.readPathRobot(handler, this);
 	}
 	
 	public void spawn() { 
 		setAngle(90);
-		setPosition2D(spawn);
+		setPosition2D(spawn.getLocation());
 //		edit = true;
 	}
 	
@@ -179,7 +184,7 @@ public class Robot extends Entity {
 					}
 				} else {
 					vectorEditIndex = -1;
-					spawn = getPosition2D();
+					spawn.setDistanceFromLeftWall(getPosition2D().x);
 				}
 			} else if(vectorEditIndex == -2) {//Move Robot
 				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
@@ -275,8 +280,8 @@ public class Robot extends Entity {
 //		push(translate.multiply(1, -1), delta);
 //	}
 	
-	public Vector2f getSpawn() { return spawn; }
-	public void setSpawn(Vector2f spwan) { this.spawn = spwan; }
+	public Spawn getSpawn() { return spawn; }
+	public void setSpawn(Spawn spawn) { this.spawn = spawn; }
 	
 	public void edit() { this.edit = true; }
 	
@@ -286,6 +291,8 @@ public class Robot extends Entity {
 	public ArrayList<Vector2f> getLl() { return ll; }
 
 	public void disableEdit() { this.edit = false; }
+	
+	public RobotInformationPassThrough getInfo() { return robotInfo; }
 	
 	public float getDistanceBetweenWheels() { return distanceBetweenWheels; }
 	public int getTeamNumber() { return teamNumber; }

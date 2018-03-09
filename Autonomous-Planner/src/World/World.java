@@ -57,6 +57,8 @@ public class World {
 		
 		place(new Switch(handler, field), new Vector2f(22, 128));
 		replaceIndex = -1;
+		
+		replaceRobot(0, 3555, handler.getWorld().getRobots()[0] == null ? 0 : handler.getWorld().getRobots()[0].getPosition2D().x - (handler.getWorld().getRobots()[0].getWidth() / 2.0f));
 	}
 	
 	public boolean place(WorldObject object, Vector3f position, float angle) {
@@ -82,7 +84,7 @@ public class World {
 		cameraMovement.update(delta);
 
 		if(replaceIndex != -1) {//Need to make the robot on the OpenGL thread, not the Swing / AWT Thread
-			robots[replaceIndex] = new Robot(handler, replaceTeamNumber, replaceX);
+			robots[replaceIndex] = new Robot(handler, replaceTeamNumber);
 			handler.getFrame().updateRobotNumbers(replaceTeamNumber);
 			replaceIndex = -1;
 		}
@@ -117,6 +119,13 @@ public class World {
 	}
 	
 	public Robot[] getRobots() { return robots; }
+	
+	public Robot getRobot(int teamNumber) { 
+		for(Robot robot : robots) 
+			if(robot != null && robot.getTeamNumber() == teamNumber)
+				return robot;
+		return null;
+	}
 	
 	public Field getField() { return field; }
 	

@@ -1,7 +1,11 @@
 package Main;
 
+import java.util.HashMap;
+
 import com.Engine.RenderEngine.Window.Window;
 
+import Entity.FreeMoving.Robot;
+import Entity.FreeMoving.RobotInformationPassThrough;
 import Input.KeyManager;
 import Input.MouseManager;
 import UI.Frame;
@@ -16,10 +20,13 @@ public class Handler {
 	
 	private Frame frame;
 	
+	private HashMap<Integer, RobotInformationPassThrough> robotInfo;
+	
 	public Handler(Game game) {
 		this.game = game;
 		
 		keyManager = new KeyManager();
+		robotInfo = new HashMap<>();
 	}
 
 	public void init() {
@@ -38,4 +45,10 @@ public class Handler {
 	public MouseManager getMouseManager() { return mouseManager; }
 	public int getWidth() { return game.getWindow().getWidth(); }
 	public int getHeight() { return game.getWindow().getHeight(); }
+	
+	public RobotInformationPassThrough getRobotInfo(int teamNumber) {
+		if(!robotInfo.containsKey(teamNumber)) 
+			robotInfo.put(teamNumber, new RobotInformationPassThrough(this, teamNumber));
+		return robotInfo.get(teamNumber);
+	}
 }

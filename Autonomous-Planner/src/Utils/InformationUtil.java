@@ -10,8 +10,12 @@ import java.util.Scanner;
 import com.Engine.Util.Vectors.Vector2f;
 
 import Entity.FreeMoving.Robot;
+import Entity.FreeMoving.RobotInformationPassThrough;
+import Entity.FreeMoving.Spawn;
+import Main.Handler;
 import UI.Frame;
 import UI.RobotPanel;
+import UI.SpawnLocationEditPanel;
 
 public class InformationUtil {
 	public static void readInformation(Frame frame) throws FileNotFoundException {
@@ -87,7 +91,7 @@ public class InformationUtil {
 		writer.close();
 	}
 	
-	public static void readPath(Robot robot) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
+	public static void readPathRobot(Handler handler, Robot robot) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
 		File file = new File("res/Information/" + robot.getTeamNumber() + "/r" + robot.getTeamNumber() + ".path");
 		
 		Scanner sc;
@@ -109,15 +113,20 @@ public class InformationUtil {
 				currentList = robot.getRl();
 			else if(line.equals("lr"))
 				currentList = robot.getLr();
-			else if(currentList == null) {//spawn location
-				String[] values = line.split(" ");
-				
-				if(values.length == 2) {
-					Vector2f location = new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
-					robot.setSpawn(location.subtract(robot.getDimensions().divide(2)));
-					robot.setPosition2D(location.subtract(robot.getDimensions().divide(2)));
-				}
-			} else {
+//			else if(currentList == null) {//spawn locations
+//				String[] values = line.split(" ");
+//				
+//				if(values.length == 2) {
+////					Vector2f location = new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
+////					robot.setSpawn(new Spawn("Default", location.subtract(robot.getDimensions().divide(2)).x));
+////					robot.setPosition2D(location.subtract(robot.getDimensions().divide(2)));
+//					
+//					RobotPanel robotPanel = handler.getFrame().getRobotPanel(robot.getTeamNumber());
+//					if(robotPanel != null) 
+//						robotPanel.addSpawnLocationPanel(new Spawn(values[0], Float.parseFloat(values[1])));
+//				}
+//			} 
+			else {
 				String[] values = line.split(" ");
 				
 				if(values.length == 2)
@@ -128,7 +137,47 @@ public class InformationUtil {
 		sc.close();
 	}
 	
-	public static void exportPath(Robot robot) {
+	public static void readPathUI(RobotPanel robotPanel, int teamNumber) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
+		File file = new File("res/Information/" + teamNumber + "/r" + teamNumber + ".path");
+		
+		Scanner sc;
+		try {
+			sc = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			return;
+		}
+
+		boolean addedSpawn = false;
+		boolean first = true;
+		
+		while(sc.hasNextLine()) {
+			String line = sc.nextLine();
+			
+			String[] values = line.split(" ");
+			
+			if(robotPanel != null && values[0].equals("Spawn")) { 
+				SpawnLocationEditPanel panel = robotPanel.addSpawnLocationPanel(new Spawn(values[1], Float.parseFloat(values[2])));
+				if(first) {
+					panel.getRadioButton().doClick();
+					
+					first = false;
+				}
+
+				addedSpawn = true;
+			}
+		}
+		
+		if(!addedSpawn) { //Make sure that there is at least one Spawn edit panel
+			SpawnLocationEditPanel panel = robotPanel.addSpawnLocationPanel(new Spawn("Default", 0.0f));
+			panel.getRadioButton().doClick();
+		}
+		
+		sc.close();
+	}
+	
+	public static void exportPath(Handler handler, Robot robot) {
+		RobotInformationPassThrough info = robot.getInfo();
+		
 		File directory = new File("res/Information/" + robot.getTeamNumber());
 		
 		if(!directory.exists()) {
@@ -156,8 +205,12 @@ public class InformationUtil {
 			e.printStackTrace();
 		}
 		
-		writer.println(robot.getSpawn().x + " " + robot.getSpawn().y);
+		//Spawn
+		for(Spawn spawn : info.getSpawns()) {
+			writer.println("Spawn " + spawn.getName() + " " + spawn.getLocation().x); //robot.getSpawn().getLocation().x + " " + robot.getSpawn().getLocation().y);
+		}
 		
+		//Actual Path
 		writer.println("rr");
 		for(Vector2f vector : robot.getRr())
 			writer.println(vector.x + " " + vector.y);

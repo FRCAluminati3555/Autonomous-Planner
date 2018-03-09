@@ -1,6 +1,7 @@
 package UI;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -8,30 +9,28 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
 import Entity.FreeMoving.Robot;
+import Entity.FreeMoving.RobotInformationPassThrough;
+import Entity.FreeMoving.Spawn;
 import Main.Handler;
 import Utils.AssetLoader;
 import Utils.InformationUtil;
 import World.World;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-
-import java.awt.CardLayout;
-import java.awt.FlowLayout;
-import java.awt.Component;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JRadioButton;
+import javax.swing.border.BevelBorder;
 
 public class RobotPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -43,15 +42,22 @@ public class RobotPanel extends JPanel {
 	private JLabel teamNumberField;
 	private JTextArea descriptionField;
 	
+	private Box spawnsBox;
+	private ButtonGroup spawnRadioGroup;
+	
+	private RobotInformationPassThrough robotInfo;
 	private Handler handler;
 	private World world;
 	
 	public RobotPanel(Handler handler, String teamName, String robotName, int teamNumber, String description) {
 		super();
-
+		
 		this.teamNumber = teamNumber;
 		this.handler = handler;
 		this.world = handler.getWorld();
+		robotInfo = handler.getRobotInfo(teamNumber);
+		
+		spawnRadioGroup = new ButtonGroup();
 		
 		setName(Integer.toString(teamNumber));
 		setLayout(new BorderLayout(0, 0));
@@ -199,20 +205,32 @@ public class RobotPanel extends JPanel {
 		verticalBox.add(movmentLabel);
 		
 		JPanel spawnLocationPanel = new JPanel();
+		spawnLocationPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		verticalBox.add(spawnLocationPanel);
 		spawnLocationPanel.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane spawnLocationScrollPane = new JScrollPane();
-		spawnLocationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		
 		JLabel spawnLocationScrollLabel = new JLabel("Spawn Locations");
 		spawnLocationScrollLabel.setFont(new Font("Consolas", Font.PLAIN, 16));
-		spawnLocationScrollPane.setColumnHeaderView(spawnLocationScrollLabel);
-		spawnLocationPanel.add(spawnLocationScrollPane);
 		
-		Box spawnsBox = Box.createVerticalBox();
-		spawnsBox.add(new SpwanLocationEditPanel());
-		spawnLocationScrollPane.setViewportView(spawnsBox);
+		JButton addSpawnButton = new JButton("+");
+		addSpawnButton.setFont(new Font("Consolas", Font.PLAIN, 16));
+		
+		JPanel spawnLocationsHeaderPanel = new JPanel();
+		spawnLocationPanel.add(spawnLocationsHeaderPanel, BorderLayout.NORTH);
+		spawnLocationsHeaderPanel.setLayout(new BorderLayout());
+		spawnLocationsHeaderPanel.add(spawnLocationScrollLabel, BorderLayout.WEST);
+		spawnLocationsHeaderPanel.add(addSpawnButton, BorderLayout.EAST);
+		
+		spawnsBox = Box.createVerticalBox();
+		spawnLocationPanel.add(spawnsBox, BorderLayout.CENTER);
+		
+		addSpawnButton.addActionListener(e -> {
+			addSpawnLocationPanel(new Spawn());
+			validate();
+			repaint();
+			doLayout();
+			revalidate();
+		});
 		
 		JPanel ownershipPanel = new JPanel();
 		verticalBox.add(ownershipPanel);
@@ -257,6 +275,13 @@ public class RobotPanel extends JPanel {
 		verticalBox.add(actionEditPanel);
 	}
 	
+	public SpawnLocationEditPanel addSpawnLocationPanel(Spawn spawn) {
+		SpawnLocationEditPanel panel = new SpawnLocationEditPanel(handler, robotInfo, spawn);
+		spawnRadioGroup.add(panel.getRadioButton());
+		spawnsBox.add(panel);
+		return panel;
+	}
+	
 	private void saveInformation() {
 		InformationUtil.exportInformation(this);
 	}
@@ -265,7 +290,7 @@ public class RobotPanel extends JPanel {
 		for(Robot robot : world.getRobots()) {
 			if(robot != null) {
 				if(robot.getTeamNumber() == teamNumber) {
-					InformationUtil.exportPath(robot);
+					InformationUtil.exportPath(handler, robot);
 					break; 
 				}
 			}
