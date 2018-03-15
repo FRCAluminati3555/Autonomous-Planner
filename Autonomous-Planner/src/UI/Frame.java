@@ -81,15 +81,19 @@ public class Frame extends JFrame {
 		robotPanels.put(teamNumber, panel);
 		
 		addRobotPanel(scroll);
-		InformationUtil.readPathUI(panel, teamNumber);
+		InformationUtil.readPath(handler, panel, teamNumber);
+	}
+	
+	public HashMap<Integer, RobotPanel> getRobotPanels() {
+		return robotPanels;
+	}
+	
+	public ConfigPanel getConfigPanel() {
+		return config;
 	}
 	
 	public RobotPanel getRobotPanel(int teamNumber) {
 		return robotPanels.get(teamNumber);
-	}
-	
-	public void updateRobotNumbers(int teamNumber) {
-		config.updateTeamNumbers(teamNumber);
 	}
 	
 	public void addRobotPanel(Component comp) {

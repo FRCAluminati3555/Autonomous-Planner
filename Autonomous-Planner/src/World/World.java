@@ -16,6 +16,7 @@ import Input.CameraMovement;
 import Main.Assets;
 import Main.Game;
 import Main.Handler;
+import Utils.Util;
 import World.Tiles.Render.TileInstanceModel;
 
 public class World {
@@ -31,13 +32,12 @@ public class World {
 	
 	private int replaceIndex;
 	private int replaceTeamNumber;
-	private float replaceX;
 	
 	public World(Handler handler) {
 		this.handler = handler;
 		
 		camera = new Camera(70, (float) handler.getWidth() / (float) handler.getHeight(), 0.3f, 1000);
-		cameraMovement = new CameraMovement(handler, camera, new Vector3f(30, 56, 192), 10, 10, .15f);
+		cameraMovement = new CameraMovement(handler, camera, new Vector3f(40, 40, -30), 10, 10, .15f);
 //		cameraMovement = new CameraMovement(handler, camera, new Vector3f(0, 10, 10), 10, 10, .15f);
 		
 		sun = new ArrayList<>();
@@ -46,8 +46,8 @@ public class World {
 	public void init() {
 		VectorModel.init(Game.physicsShader);
 		
-		field = new Field(handler, new Vector3f(), new Vector2f(82, 164));
-		sun.add(new Light(new Vector3f(41, 100, 91), new Vector3f(1), new Vector3f(.5, 0, 0)));
+		field = new Field(handler, new Vector3f(), new Vector2f(82, 80));
+		sun.add(new Light(new Vector3f(41, 100, 20), new Vector3f(1), new Vector3f(.5, 0, 0)));
 		
 		robots = new Robot[3];
 		
@@ -55,11 +55,18 @@ public class World {
 //		robots[1] = new Robot(handler, 1729, 70);
 //		robots[2] = new Robot(handler, 1010, 10);
 		
-		place(new Switch(handler, field), new Vector2f(22, 128));
+		s = new Switch(handler, field);
+		
+		place(s, new Vector2f(22, 36));
 		replaceIndex = -1;
 		
-		replaceRobot(0, 3555, handler.getWorld().getRobots()[0] == null ? 0 : handler.getWorld().getRobots()[0].getPosition2D().x - (handler.getWorld().getRobots()[0].getWidth() / 2.0f));
+		replaceRobot(0, 3555);
+		
+//		robots[0] = new Robot(handler, 3555);
+//		handler.getFrame().updateRobotNumbers(3555);
 	}
+	
+	private Switch s;
 	
 	public boolean place(WorldObject object, Vector3f position, float angle) {
 		object.setAngle(angle);
@@ -85,7 +92,6 @@ public class World {
 
 		if(replaceIndex != -1) {//Need to make the robot on the OpenGL thread, not the Swing / AWT Thread
 			robots[replaceIndex] = new Robot(handler, replaceTeamNumber);
-			handler.getFrame().updateRobotNumbers(replaceTeamNumber);
 			replaceIndex = -1;
 		}
 		
@@ -105,17 +111,20 @@ public class World {
 				robot.render();
 		}
 		
+//		drawLine(new Vector3f(s.getPosition3D().x, 0, 0), s.getPosition3D().subtract(0, 0, s.getHeight() / 2), new Vector3f(1, 0, 0));
+		
+//		System.out.println(new Vector3f(s.getPosition3D().x, 0, 0).distance(s.getPosition3D().subtract(0, 0, s.getHeight() / 2)));
+		
 		Assets.defaultShader.bind();
 		Assets.defaultShader.loadLights(sun);
 		TileInstanceModel.TILE_SHADER.bind();
 		TileInstanceModel.TILE_SHADER.loadLights(sun);
 	}
 	
-	public void replaceRobot(int index, int teamNumber, float x) {
+	public void replaceRobot(int index, int teamNumber) {
 //		robots[index] = new Robot(handler, teamNumber, x);
 		this.replaceIndex = index;
 		this.replaceTeamNumber = teamNumber;
-		this.replaceX = x;
 	}
 	
 	public Robot[] getRobots() { return robots; }

@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.Engine.RenderEngine.Window.Window;
 
-import Entity.FreeMoving.Robot;
 import Entity.FreeMoving.RobotInformationPassThrough;
 import Input.KeyManager;
 import Input.MouseManager;
@@ -35,6 +34,8 @@ public class Handler {
 		
 		mouseManager = new MouseManager(this);
 		frame = new Frame(this);
+		
+		frame.getConfigPanel().getRl().doClick();
 	}
 	
 	public Frame getFrame() { return frame; }

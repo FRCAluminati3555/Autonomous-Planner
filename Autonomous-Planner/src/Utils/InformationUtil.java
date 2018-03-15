@@ -7,11 +7,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.Engine.Util.Vectors.Vector2f;
-
 import Entity.FreeMoving.Robot;
 import Entity.FreeMoving.RobotInformationPassThrough;
 import Entity.FreeMoving.Spawn;
+import Entity.FreeMoving.Action.Action;
 import Main.Handler;
 import UI.Frame;
 import UI.RobotPanel;
@@ -91,54 +90,42 @@ public class InformationUtil {
 		writer.close();
 	}
 	
-	public static void readPathRobot(Handler handler, Robot robot) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
-		File file = new File("res/Information/" + robot.getTeamNumber() + "/r" + robot.getTeamNumber() + ".path");
-		
-		Scanner sc;
-		try {
-			sc = new Scanner(file);
-		} catch (FileNotFoundException e) {
-			return;
-		}
-
-		ArrayList<Vector2f> currentList = null;
-		
-		while(sc.hasNextLine()) {
-			String line = sc.nextLine();
-			if(line.equals("rr"))
-				currentList = robot.getRr();
-			else if(line.equals("ll"))
-				currentList = robot.getLl();
-			else if(line.equals("rl"))
-				currentList = robot.getRl();
-			else if(line.equals("lr"))
-				currentList = robot.getLr();
-//			else if(currentList == null) {//spawn locations
-//				String[] values = line.split(" ");
-//				
-//				if(values.length == 2) {
-////					Vector2f location = new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
-////					robot.setSpawn(new Spawn("Default", location.subtract(robot.getDimensions().divide(2)).x));
-////					robot.setPosition2D(location.subtract(robot.getDimensions().divide(2)));
-//					
-//					RobotPanel robotPanel = handler.getFrame().getRobotPanel(robot.getTeamNumber());
-//					if(robotPanel != null) 
-//						robotPanel.addSpawnLocationPanel(new Spawn(values[0], Float.parseFloat(values[1])));
+//	public static void readPathRobot(Handler handler, Robot robot) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
+//		File file = new File("res/Information/" + robot.getTeamNumber() + "/r" + robot.getTeamNumber() + ".path");
+//		RobotInformationPassThrough robotInfo = robot.getInfo();
+//		TwoKeyMap paths = robotInfo.getPaths();
+//		
+//		Scanner sc;
+//		try {
+//			sc = new Scanner(file);
+//		} catch (FileNotFoundException e) {
+//			return;
+//		}
+//		
+//		ArrayList<Action> currentList = null;
+//		while(sc.hasNextLine()) {
+//			String line = sc.nextLine();
+//			
+//			if(line.contains(",")) {//<Location, Ownership> -> Center, RL or Left, R
+//				String[] parts = line.split(",");
+//				for(int i = 0; i < parts.length; i++) {
+//					parts[i] = parts[i].replaceAll(" ", "");
 //				}
-//			} 
-			else {
-				String[] values = line.split(" ");
-				
-				if(values.length == 2)
-					currentList.add(new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1])));
-			}
-		}
-		
-		sc.close();
-	}
+//				
+//				currentList = paths.put(parts[0], parts[1]);
+//			} else {
+//				currentList.add(Action.parseAction(line));
+//			}
+//		}
+//		
+//		sc.close();
+//	}
 	
-	public static void readPathUI(RobotPanel robotPanel, int teamNumber) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
+	public static void readPath(Handler handler, RobotPanel robotPanel, int teamNumber) {//int teamNumber, ArrayList<Vector2f> rr, ArrayList<Vector2f> ll, ArrayList<Vector2f> lr, ArrayList<Vector2f> rl) {
 		File file = new File("res/Information/" + teamNumber + "/r" + teamNumber + ".path");
+		
+		RobotInformationPassThrough robotInfo = handler.getRobotInfo(teamNumber);
+		TwoKeyMap paths = robotInfo.getPaths();
 		
 		Scanner sc;
 		try {
@@ -149,14 +136,20 @@ public class InformationUtil {
 
 		boolean addedSpawn = false;
 		boolean first = true;
+		ArrayList<Action> currentList = null;
 		
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine();
 			
-			String[] values = line.split(" ");
-			
-			if(robotPanel != null && values[0].equals("Spawn")) { 
-				SpawnLocationEditPanel panel = robotPanel.addSpawnLocationPanel(new Spawn(values[1], Float.parseFloat(values[2])));
+//			if(robotPanel != null && values[0].equals("Spawn")) {
+			if(line.contains("Spawn")) {
+				String[] values = line.split(" ");
+				
+				StringBuilder s = new StringBuilder();
+				for(int i = 1; i < values.length - 1; i++) 
+					s.append(values[i]);
+				
+				SpawnLocationEditPanel panel = robotPanel.addSpawnLocationPanel(new Spawn(s.toString(), Float.parseFloat(values[values.length - 1])));
 				if(first) {
 					panel.getRadioButton().doClick();
 					
@@ -164,6 +157,15 @@ public class InformationUtil {
 				}
 
 				addedSpawn = true;
+			} else if(line.contains(",")) {//<Location, Ownership> -> Center, RL or Left, R
+				String[] parts = line.split(",");
+				for(int i = 0; i < parts.length; i++) {
+					parts[i] = parts[i].replaceAll(" ", "");
+				}
+				
+				currentList = paths.put(parts[0], parts[1]);
+			} else if(!line.isEmpty()){
+				currentList.add(Action.parseAction(line));
 			}
 		}
 		
@@ -207,25 +209,37 @@ public class InformationUtil {
 		
 		//Spawn
 		for(Spawn spawn : info.getSpawns()) {
-			writer.println("Spawn " + spawn.getName() + " " + spawn.getLocation().x); //robot.getSpawn().getLocation().x + " " + robot.getSpawn().getLocation().y);
+			writer.println("Spawn " + spawn.getName() + " " + Util.tilesToMeters(spawn.getLocation().x)); //robot.getSpawn().getLocation().x + " " + robot.getSpawn().getLocation().y);
 		}
 		
 		//Actual Path
-		writer.println("rr");
-		for(Vector2f vector : robot.getRr())
-			writer.println(vector.x + " " + vector.y);
-
-		writer.println("ll");
-		for(Vector2f vector : robot.getLl())
-			writer.println(vector.x + " " + vector.y);
 		
-		writer.println("rl");
-		for(Vector2f vector : robot.getRl())
-			writer.println(vector.x + " " + vector.y);
+		TwoKeyMap map = info.getPaths();
+		for(String location : map.keySet()) {
+			for(String ownership : map.get(location).keySet()) {
+				writer.println(location + ", " + ownership);
+				
+				for(Action a : map.get(location, ownership)) {
+					writer.println(a);
+				}
+			}
+		}
 		
-		writer.println("lr");
-		for(Vector2f vector : robot.getLr())
-			writer.println(vector.x + " " + vector.y);
+//		writer.println("rr");
+//		for(Vector2f vector : robot.getRr())
+//			writer.println(vector.x + " " + vector.y);
+//
+//		writer.println("ll");
+//		for(Vector2f vector : robot.getLl())
+//			writer.println(vector.x + " " + vector.y);
+//		
+//		writer.println("rl");
+//		for(Vector2f vector : robot.getRl())
+//			writer.println(vector.x + " " + vector.y);
+//		
+//		writer.println("lr");
+//		for(Vector2f vector : robot.getLr())
+//			writer.println(vector.x + " " + vector.y);
 		
 		writer.close();
 	}

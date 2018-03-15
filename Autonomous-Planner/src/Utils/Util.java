@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 
-import World.Tiles.Tile;
-
 public class Util {
+	public static final float metersPerTile = .1f;
 	
 	/****** Nearest Multiple ******/
 	public static float roundNearestMultiple(float number, float roundTo) {
@@ -149,12 +148,32 @@ public class Util {
 		return new Vector3f(vector.x, y, vector.y);
 	}
 	
-	/****** Tiles ******/
-	public static Vector2f toGrid(Vector2f vector) {
-		return roundNearestMultiple(vector, .5f);
+	/****** Units ******/
+	public static float metersToTiles(float meters) {
+		return meters / metersPerTile;
 	}
 	
-	public static int getSubCoord(float pos) {
-		return (int) (roundNearestMultiple(pos - (int) pos, (float) (1.0 / Tile.TILE_RESOLUTION)) * Tile.TILE_RESOLUTION);
+	public static float tilesToMeters(float tiles) {
+		return tiles * metersPerTile;
+	}
+	
+	public static float metersPerSecondToTilesPerSecond(float metersPerSecond) {
+		return metersPerSecond / metersPerTile;
+	}
+	
+	public static float tilesPerSecondToMetersPerSecond(float tilesPerSecond) {
+		return tilesPerSecond * metersPerTile;
+	}
+	
+	public static float parseFloat(String string) {
+		float number = 0;
+		
+		try {
+			number = Float.parseFloat(string);
+		} catch(NumberFormatException e) {
+			
+		}
+		
+		return number;
 	}
 }

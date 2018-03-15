@@ -66,8 +66,8 @@ public class SpawnLocationEditPanel extends JPanel {
 			}
 		});
 		
-		JLabel lblDistanceFromLeft = new JLabel("Distance From Left Side: ");
-		add(lblDistanceFromLeft);
+		JLabel lblDistanceFromRight = new JLabel("Distance From Right Side: ");
+		add(lblDistanceFromRight);
 		
 		distanceFromLeftField = new JTextField();
 		add(distanceFromLeftField);
@@ -90,7 +90,7 @@ public class SpawnLocationEditPanel extends JPanel {
 			}
 		});
 		
-		distanceFromLeftField.setText(Float.toString(spawn.getLocation().x));
+		distanceFromLeftField.setText(Float.toString(spawn.getDistanceMeters()));
 		
 		radioButton.addActionListener(e -> {
 			if(radioButton.isSelected()) {
@@ -112,7 +112,7 @@ public class SpawnLocationEditPanel extends JPanel {
 			distance = 0;
 		}
 		
-		spawn.setDistanceFromLeftWall(distance);
+		spawn.setDistanceFromRightWallMeters(distance);
 		
 		if(radioButton.isSelected()) {
 			robotInfo.setSpawn(spawn);

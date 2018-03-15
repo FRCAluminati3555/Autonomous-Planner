@@ -37,9 +37,7 @@ public class MovementFunction extends Action {
 	
 	private boolean negative, zAxis, reverse;
 	
-	public MovementFunction(Handler handler, Entity entity, Function function, float minX, float maxX, boolean negative, boolean zAxis, boolean reverse) {
-		super(handler);
-		
+	public MovementFunction(Entity entity, Function function, float minX, float maxX, boolean negative, boolean zAxis, boolean reverse) {
 		this.entity = entity;
 		this.function = function;
 		

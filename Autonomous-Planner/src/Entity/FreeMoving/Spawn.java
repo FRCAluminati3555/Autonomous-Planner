@@ -2,8 +2,10 @@ package Entity.FreeMoving;
 
 import com.Engine.Util.Vectors.Vector2f;
 
+import Utils.Util;
+
 public class Spawn {
-	public static float startZ = 155;
+	public static float startZ = 0;
 	
 	private String name;
 	private Vector2f location;
@@ -13,8 +15,8 @@ public class Spawn {
 		this.location = location;
 	}
 	
-	public Spawn(String name, float distanceFromLeftWall) {
-		this(name, new Vector2f(distanceFromLeftWall, startZ));
+	public Spawn(String name, float distanceFromRightWall) {
+		this(name, new Vector2f(Util.metersToTiles(distanceFromRightWall), startZ));
 	}
 	
 	public Spawn() {
@@ -25,5 +27,9 @@ public class Spawn {
 	public String getName() { return name; }
 	
 	public void setName(String name) { this.name = name; }
-	public void setDistanceFromLeftWall(float distance) { this.location = new Vector2f(distance, startZ); }
+	
+	public void setDistanceFromRightWallTiles(float distance) { this.location = new Vector2f(distance, startZ); }
+	public void setDistanceFromRightWallMeters(float distanceMeters) { this.location = new Vector2f(Util.metersToTiles(distanceMeters), startZ); }
+	
+	public float getDistanceMeters() { return Util.tilesToMeters(location.x); }
 }

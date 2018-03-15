@@ -9,7 +9,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -18,19 +21,21 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 
 import Entity.FreeMoving.Robot;
 import Entity.FreeMoving.RobotInformationPassThrough;
 import Entity.FreeMoving.Spawn;
+import Entity.FreeMoving.Action.Action;
+import Entity.FreeMoving.Action.Robot.MoveDistance;
+import Entity.FreeMoving.Action.Robot.Turn;
+import Entity.FreeMoving.Action.Robot.WaitAction;
 import Main.Handler;
 import Utils.AssetLoader;
 import Utils.InformationUtil;
 import World.World;
-import javax.swing.border.BevelBorder;
 
 public class RobotPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -44,10 +49,13 @@ public class RobotPanel extends JPanel {
 	
 	private Box spawnsBox;
 	private ButtonGroup spawnRadioGroup;
+	private ButtonGroup ownershipGroup;
 	
 	private RobotInformationPassThrough robotInfo;
 	private Handler handler;
 	private World world;
+
+	private Box actionVerticalBox;
 	
 	public RobotPanel(Handler handler, String teamName, String robotName, int teamNumber, String description) {
 		super();
@@ -226,9 +234,6 @@ public class RobotPanel extends JPanel {
 		
 		addSpawnButton.addActionListener(e -> {
 			addSpawnLocationPanel(new Spawn());
-			validate();
-			repaint();
-			doLayout();
 			revalidate();
 		});
 		
@@ -247,11 +252,23 @@ public class RobotPanel extends JPanel {
 		JRadioButton rlBtn = new JRadioButton("RL");
 		ownershipButtonPanel.add(rlBtn);
 		
+		rlBtn.addActionListener(e -> {
+			if(rlBtn.isSelected()) {
+				robotInfo.setOwnership("RL");
+			}
+		});
+		
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		ownershipButtonPanel.add(horizontalStrut);
 		
 		JRadioButton lrBtn = new JRadioButton("LR");
 		ownershipButtonPanel.add(lrBtn);
+		
+		lrBtn.addActionListener(e -> {
+			if(lrBtn.isSelected()) {
+				robotInfo.setOwnership("LR");
+			}
+		});
 		
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		ownershipButtonPanel.add(horizontalStrut_1);
@@ -259,20 +276,81 @@ public class RobotPanel extends JPanel {
 		JRadioButton rrBtn = new JRadioButton("RR");
 		ownershipButtonPanel.add(rrBtn);
 		
+		rrBtn.addActionListener(e -> {
+			if(rrBtn.isSelected()) {
+				robotInfo.setOwnership("RR");
+			}
+		});
+		
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		ownershipButtonPanel.add(horizontalStrut_2);
 		
 		JRadioButton llBtn = new JRadioButton("LL");
 		ownershipButtonPanel.add(llBtn);
 		
-		ButtonGroup ownershipGroup = new ButtonGroup();
+		llBtn.addActionListener(e -> {
+			if(llBtn.isSelected()) {
+				robotInfo.setOwnership("LL");
+			}
+		});
+		
+		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
+		ownershipButtonPanel.add(horizontalStrut_3);
+		
+		JRadioButton lBtn = new JRadioButton("L");
+		ownershipButtonPanel.add(lBtn);
+		
+		lBtn.addActionListener(e -> {
+			if(lBtn.isSelected()) {
+				robotInfo.setOwnership("L");
+			}
+		});
+		
+		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
+		ownershipButtonPanel.add(horizontalStrut_4);
+		
+		JRadioButton rBtn = new JRadioButton("R");
+		ownershipButtonPanel.add(rBtn);
+		
+		rBtn.addActionListener(e -> {
+			if(rBtn.isSelected()) {
+				robotInfo.setOwnership("R");
+			}
+		});
+		
+		ownershipGroup = new ButtonGroup();
 		ownershipGroup.add(llBtn);
 		ownershipGroup.add(lrBtn);
 		ownershipGroup.add(rlBtn);
 		ownershipGroup.add(rrBtn);
+		ownershipGroup.add(rBtn);
+		ownershipGroup.add(lBtn);
 		
 		JPanel actionEditPanel = new JPanel();
+		
+		actionEditPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		verticalBox.add(actionEditPanel);
+		actionEditPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel actionEditHeaderPanel = new JPanel();
+		actionEditPanel.add(actionEditHeaderPanel, BorderLayout.NORTH);
+		actionEditHeaderPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel actionHeaderLabel = new JLabel("Actions");
+		actionHeaderLabel.setFont(new Font("Consolas", Font.PLAIN, 16));
+		actionHeaderLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		actionEditHeaderPanel.add(actionHeaderLabel, BorderLayout.WEST);
+		
+		JButton addActionButton = new JButton("+");
+		addActionButton.setFont(new Font("Consolas", Font.PLAIN, 16));
+		addActionButton.addActionListener(e -> {
+			new AddActionFrame(handler, teamNumber);
+		});
+		
+		actionEditHeaderPanel.add(addActionButton, BorderLayout.EAST);
+		
+		actionVerticalBox = Box.createVerticalBox();
+		actionEditPanel.add(actionVerticalBox, BorderLayout.SOUTH);
 	}
 	
 	public SpawnLocationEditPanel addSpawnLocationPanel(Spawn spawn) {
@@ -280,6 +358,47 @@ public class RobotPanel extends JPanel {
 		spawnRadioGroup.add(panel.getRadioButton());
 		spawnsBox.add(panel);
 		return panel;
+	}
+	
+	public void setPathList(ArrayList<Action> actions) {
+		actionVerticalBox.removeAll();
+		
+		if(actions != null) {
+			for(Action action : actions) {
+//				if(action instanceof MoveDistance) {
+//					MoveDistance a = (MoveDistance) action;
+//					
+//					ForwardActionPanel panel = new ForwardActionPanel(this, actions, a);
+//					actionVerticalBox.add(panel);
+//					panel.init(panel);
+//				}
+				addAction(action);
+			}
+		}
+		
+		revalidate();
+	}
+	
+	public void addAction(Action action) {
+		if(action instanceof MoveDistance) {
+			MoveDistance a = (MoveDistance) action;
+			
+			ForwardActionPanel panel = new ForwardActionPanel(this, handler.getRobotInfo(teamNumber).getPath(), a);
+			actionVerticalBox.add(panel);
+			panel.init(panel);
+		} else if(action instanceof Turn) {
+			Turn a = (Turn) action;
+			
+			TurnActionPanel panel = new TurnActionPanel(this, handler.getRobotInfo(teamNumber).getPath(), a);
+			actionVerticalBox.add(panel);
+			panel.init(panel);
+		} else if(action instanceof WaitAction) {
+			WaitAction a = (WaitAction) action;
+			
+			WaitActionPanel panel = new WaitActionPanel(this, handler.getRobotInfo(teamNumber).getPath(), a);
+			actionVerticalBox.add(panel);
+			panel.init(panel);
+		}
 	}
 	
 	private void saveInformation() {
@@ -348,6 +467,20 @@ public class RobotPanel extends JPanel {
         return new ImageIcon(dst);
 	}
 
+	public JRadioButton getOwnershipButton(String ownership) {
+		Enumeration<AbstractButton> buttons = ownershipGroup.getElements();
+		
+		while(buttons.hasMoreElements()) {
+			AbstractButton b = buttons.nextElement();
+			
+			if(b.getText().equalsIgnoreCase(ownership)) {
+				return (JRadioButton) b;
+			}
+		}
+		
+		return null;
+	}
+	
 	public JTextArea getRobotNameField() { return robotNameField; }
 	public JTextArea getTeamNameField() { return teamNameField; }
 	public JTextArea getDescriptionField() { return descriptionField; }

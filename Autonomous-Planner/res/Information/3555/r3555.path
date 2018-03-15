@@ -1,9 +1,26 @@
-Spawn Center 35.0
-Spawn Right 60.0
-rr
-13.0 159.5
-13.0 121.0
-43.0 121.0
-ll
-rl
-lr
+Spawn Left 7.0
+Spawn LeftOfExchange 5.7
+Spawn RightOfExchange 2.5
+Spawn Right 1.0
+Left, R
+Forward 2.6 0.5
+Left, L
+Forward 3.8500001 0.5
+Turn 90.0 0.5
+Forward 0.5 0.5
+RightOfExchange, R
+Forward 2.6 0.5
+RightOfExchange, L
+Forward 2.4 0.5
+LeftOfExchange, R
+Forward 2.6 0.5
+LeftOfExchange, L
+Forward 0.95 0.5
+Turn 15.0 0.5
+Forward 1.7270001 0.5
+Right, R
+Forward 3.8500001 0.5
+Turn -90.0 0.5
+Forward 0.5 0.5
+Right, L
+Forward 2.6 0.5

@@ -46,22 +46,21 @@ public class Game {
 	/** 
 	 * THE PLAN:
 	 * 		- Edit Movement 
-	 * 			- Editable values for distances
+	 * 			- ✔ Editable values for distances
 	 * 			- Different Types of Turns
-	 * 			- Different Velocities at each 
-	 * 			- From Center or from front?
-	 * 
+	 * 			- ✔ Different Velocities at each 
+	 * 			- ✔ From Center or from front? -> Front of robot
+	 * 			- ✔ Reorder
+	 * 			- Add
+	 * 			- ✔ Remove
+	 * 			
 	 * 			- Pickup / Deposit Cubes   -|
 	 * 			- Wait Function            -| <- Render?
 	 * 												- Different Symbol Models at each Point location with colors
 	 * 		
-	 * 		- Make Positions Changeable (Different Spawn Locations)
-	 * 			- List of spawn locations that are all selectable and generateable <- Add to a scroll pane of radio buttons		
+	 * 		- ✔ Make Positions Changeable (Different Spawn Locations)
+	 * 			- ✔ List of spawn locations that are all selectable and generateable <- Add to a scroll pane of radio buttons		
 	 * 
-	 * 		-Different Type Of Actions
-	 * 			- Add Action popup 
-	 * 				- Different Types of actions and properties of those actions
-	 * 			- Editable TextFields for properties for those actions
 	 * 		- Scoring
 	 * 			- Render Score
 	 * 			- Timer -> Score per second

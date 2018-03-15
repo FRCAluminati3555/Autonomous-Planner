@@ -73,11 +73,11 @@ public class LoadIntoWorldPanel extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLocationRelativeTo(handler.getFrame());
 		frame.add(this);
-		frame.setSize(400, 300);
+		frame.setSize(400, 200);
 		frame.setVisible(true);
 	}
 	
 	private void replaceRobot(int index) {
-		handler.getWorld().replaceRobot(index, teamNumber, handler.getWorld().getRobots()[index] == null ? 0 : handler.getWorld().getRobots()[index].getPosition2D().x - (handler.getWorld().getRobots()[index].getWidth() / 2.0f));
+		handler.getWorld().replaceRobot(index, teamNumber);
 	}
 }

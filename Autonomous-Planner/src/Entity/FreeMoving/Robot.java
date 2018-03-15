@@ -1,14 +1,8 @@
 package Entity.FreeMoving;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
-import org.lwjgl.input.Keyboard;
-
-import com.Engine.Demo.RenderTester;
 import com.Engine.RenderEngine.Font.Font;
-import com.Engine.RenderEngine.Font.TextMeshStitcher;
 import com.Engine.RenderEngine.Font.Render.TextMesh;
 import com.Engine.RenderEngine.Font.Render.TextRenderProperties;
 import com.Engine.RenderEngine.Util.RenderStructs.Transform;
@@ -16,11 +10,11 @@ import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 import com.Engine.Util.Vectors.Vector4f;
 
-import Entity.FreeMoving.Action.Robot.MoveToAction;
-import Input.MousePicker;
+import Entity.FreeMoving.Action.Action;
+import Entity.FreeMoving.Action.Robot.MoveDistance;
+import Entity.FreeMoving.Action.Robot.Turn;
 import Main.Assets;
 import Main.Handler;
-import Utils.InformationUtil;
 import Utils.Util;
 
 public class Robot extends Entity {
@@ -33,51 +27,34 @@ public class Robot extends Entity {
 
 	private float distanceBetweenWheels;
 	
-	private boolean edit;
-	
-	private int vectorEditIndex;
-	
-	private ArrayList<Vector2f> rl;
-	private ArrayList<Vector2f> lr;
-	private ArrayList<Vector2f> rr;
-	private ArrayList<Vector2f> ll;
-	
 	//Current
-	private ArrayList<Vector2f> verticies;
-	
 	private Spawn spawn;
 	private Vector3f color;
 	
 	private RobotInformationPassThrough robotInfo;
+	private ArrayList<Action> path;
+	
+	private boolean running;
 	
 	public Robot(Handler handler, int teamNumber) {
 		super(handler, Assets.getModel(teamNumber), Assets.getTexture(teamNumber));
 		
 		robotInfo = handler.getRobotInfo(teamNumber);
-		
 		spawn = robotInfo.getSpawn();
+		path = robotInfo.getPath();
 		
 		this.teamNumber = teamNumber;
 		this.movementSpeed = new Vector2f(Assets.getSpeed(teamNumber));
 		this.distanceBetweenWheels = Assets.getDistanceBetweenWheels(teamNumber);
 		this.color = Vector3f.random(1);
 
-		vectorEditIndex = -1;
-
-		rl = new ArrayList<>();
-		lr = new ArrayList<>();
-		ll = new ArrayList<>();
-		rr = new ArrayList<>();
-		
-		verticies = rr;
-		
 		spawn();
 		
 		text = Assets.generateTextMesh(Integer.toString(teamNumber), handler.getWindow());
 		text.setShader(Font.BillboardShader);
 		textProperties = new TextRenderProperties(new Transform(new Vector3f(), new Vector3f(), new Vector3f(1)), new Vector4f(1, 1, 1, 1));
 		
-		InformationUtil.readPathRobot(handler, this);
+//		InformationUtil.readPathRobot(handler, this);
 	}
 	
 	public void spawn() { 
@@ -87,128 +64,32 @@ public class Robot extends Entity {
 	}
 	
 	public void start() {
-		vectorEditIndex = -1;
-		edit = false;
-		
-		for(Vector2f vector : verticies) {
-			addAction(new MoveToAction(handler, this, vector));
+		if(path != null) {
+			for(Action action : path) {
+				action.setComplete(false);
+				action.setStarted(false);
+			}
 		}
+		
+		running = true;
 	}
 	
 	public void stop() {
-		actionQueue.getActions().clear();
+		running = false;
 	}
 	
 	public void update(float delta) {
-		actionQueue.update(delta);
-
-//		if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RIGHT)) {
-//			listIndex++;
-//			
-//			if(listIndex == 4)
-//				listIndex = 0;
-//			
-//			if(listIndex == 0)
-//				verticies = ll;
-//			else if(listIndex == 1)
-//				verticies = lr;
-//			else if(listIndex == 2)
-//				verticies = rl;
-//			else
-//				verticies = rr;
-//		} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_LEFT)) {
-//			listIndex--;
-//			
-//			if(listIndex == -1)
-//				listIndex = 3;
-//			
-//			if(listIndex == 0)
-//				verticies = ll;
-//			else if(listIndex == 1)
-//				verticies = lr;
-//			else if(listIndex == 2)
-//				verticies = rl;
-//			else
-//				verticies = rr;
-//		}
-		
-		if(edit) {
-			if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_DELETE)) {
-				if(vectorEditIndex != -1) {
-					verticies.remove(vectorEditIndex);
-					vectorEditIndex = -1;
-				}
-			} else if(handler.getKeyManager().keyJustPressed(Keyboard.KEY_RETURN)) {
-				if(vectorEditIndex == -1)
-					vectorEditIndex = verticies.size();
-				else
-					vectorEditIndex += 1;
-				verticies.add(vectorEditIndex, new Vector2f(Util.to2D(MousePicker.calculateHitPosition(lineElevation))));
-			}
-			
-			else if(handler.getMouseManager().keyJustReleased(0)) {
-				if(vectorEditIndex > -1) {
-					vectorEditIndex += 1;
-					verticies.add(vectorEditIndex, new Vector2f(Util.to2D(MousePicker.calculateHitPosition(lineElevation))));
-				}
-			} else if(handler.getMouseManager().keyJustReleased(1)) {
-				if(vectorEditIndex == -1) {
-					Vector2f hit = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
-
-					if(hit.distance(getPosition2D()) < getDimensions().length() / 2f) {//Click On Robot
-						vectorEditIndex = -2;
-					} else {
-						HashMap<Float, Vector2f> distances = new HashMap<>();
+		if(running) {
+			if(path != null) {
+				for(Action action : path) {
+					if(!action.isComplete()) {
+						if(!action.hasStarted())
+							action.start(this);
 						
-						for(Vector2f vector : verticies) {
-							float distance = vector.distance(hit);
-							if(distance < 2)
-								distances.put(distance, vector);
-						}
-						
-						Set<Float> list = distances.keySet();
-						if(list.size() == 0)
-							return;
-						if(list.size() > 1) {
-							float distance = Float.MAX_VALUE;
-							for(Float f : list) {
-								if(f < distance)
-									distance = f;
-							}
-							
-							vectorEditIndex = verticies.indexOf((distances.get(distance)));
-						} else {
-							Vector2f shortest = distances.get(list.iterator().next());
-							vectorEditIndex = verticies.indexOf(shortest);
-						}
+						action.update(delta);
+						return;
 					}
-				} else {
-					vectorEditIndex = -1;
-					spawn.setDistanceFromLeftWall(getPosition2D().x);
 				}
-			} else if(vectorEditIndex == -2) {//Move Robot
-				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
-				position = position.capMax(handler.getWorld().getField().getDimensions().x - getWidth(), position.getY());
-				position = position.capMin(0, position.getY());
-				setX(position.x);
-			} else if(vectorEditIndex != -1) {
-				Vector2f position = Util.to2D(MousePicker.calculateHitPosition(lineElevation));
-				
-				if(Keyboard.isKeyDown(Keyboard.KEY_F)) {
-					Vector2f anchor = null;
-					if(vectorEditIndex == 0)
-						anchor = getPosition2D();
-					else
-						anchor = verticies.get(vectorEditIndex - 1);
-					
-					if(Math.abs(anchor.x - position.x) > Math.abs(anchor.y - position.y)) {
-						if(position.getX() < + handler.getWorld().getField().getWidth() && position.x > 0)
-							position.y = anchor.y;
-					} else if(position.y < handler.getWorld().getField().getHeight() && position.y > 0)
-							position.x = anchor.x;
-				}
-				
-				verticies.get(vectorEditIndex).set(position);
 			}
 		}
 	}
@@ -217,29 +98,52 @@ public class Robot extends Entity {
 	public void render() {
 		super.render();
 		
-		textProperties.getTransform().setTranslation(Util.to3D(getPosition2D().subtract(text.getSize().x / 2.0, 0), 5));
+		textProperties.getTransform().setTranslation(Util.to3D(getPosition2D().add(text.getSize().x / 2.0, 0), 5));
 		text.render(textProperties);
 		
-		if(verticies.size() > 0) {
-			drawLine(getPosition2D(), verticies.get(0));
-			
-			if(verticies.size() > 1) {
-				for(int i = 0; i < verticies.size() - 1; i++) {
-					drawLine(verticies.get(i), verticies.get(i + 1));
+//		if(path != null) {
+//			for(Action action : path) {
+//				if(!action.isComplete()) {
+//					if(action instanceof MoveDistance) {
+//						drawLine(new Vector2f(), ((MoveDistance) action).getTarget());
+//					}
+//				}
+//			}
+//		}
+		
+		Vector2f position = spawn.getLocation().add(getWidth() / 2, getHeight());//, getHeight() / 2);
+		float angle = 90;
+		
+		if(path != null) {
+			for(Action action : path) {
+				if(action instanceof MoveDistance) {
+					MoveDistance a = (MoveDistance) action;
+					Vector2f target = new Vector2f(Math.cos(Math.toRadians(angle)) * a.getDistanceTiles() + position.x, 
+												   Math.sin(Math.toRadians(angle)) * a.getDistanceTiles() + position.y);
+					
+					drawLine(position, target);//.add(new Vector2f(getHeight() / 2).multiply(Math.cos(Math.toRadians(angle)), Math.sin(Math.toRadians(angle)))));
+					
+					position = target;
+				} else if(action instanceof Turn) {
+					Turn a = (Turn) action;
+					angle += a.getAngle();
+					
+//					position = getFrontAndCenterPosition(position, angle);
 				}
 			}
 		}
+		
+//		drawLine(new Vector2f(), getFrontAndCenterPosition()); 
 	}
 	
-	public void setGameData(int index) {
-		if(index == 0)
-			verticies = rr;
-		else if(index == 1)
-			verticies = ll;
-		else if(index == 2)
-			verticies = lr;
-		else 
-			verticies = rl;
+	public Vector2f getFrontAndCenterPosition(Vector2f position, float angle ) {
+//		float a = (float) Math.toRadians(angle);
+//		float radius = -getHeight();
+//		
+//		Vector2f target = new Vector2f(Math.cos(a) * radius + position.x, 
+//				   Math.sin(a) * radius + position.y);
+		
+		return position;
 	}
 	
 	private void drawLine(Vector2f from, Vector2f to) {
@@ -280,17 +184,34 @@ public class Robot extends Entity {
 //		push(translate.multiply(1, -1), delta);
 //	}
 	
+	public boolean isRunning() { return running; }
+	
+	public void setPath(ArrayList<Action> path) { this.path = path; }
+	
 	public Spawn getSpawn() { return spawn; }
 	public void setSpawn(Spawn spawn) { this.spawn = spawn; }
 	
-	public void edit() { this.edit = true; }
+	public Vector2f getFrontAndCenterPosition() {
+		float angle = (float) Math.toRadians(getAngle());
+		float radius = getHeight() / 2;
+		Vector2f position = getPosition2D();
+		
+		Vector2f target = new Vector2f(-Math.cos(angle) * radius + position.x, 
+				   Math.sin(angle) * radius + position.y);
+		
+		return target;
+	}
 	
-	public ArrayList<Vector2f> getRl() { return rl; }
-	public ArrayList<Vector2f> getLr() { return lr; }
-	public ArrayList<Vector2f> getRr() { return rr; }
-	public ArrayList<Vector2f> getLl() { return ll; }
-
-	public void disableEdit() { this.edit = false; }
+	public Vector2f getBackAndCenterPosition() {
+		float angle = (float) Math.toRadians(getAngle());
+		float radius = -getHeight() / 2f;
+		Vector2f position = getPosition2D();
+		
+		Vector2f target = new Vector2f(Math.cos(angle) * radius + position.x, 
+				   Math.sin(angle) * radius + position.y);
+		
+		return target;
+	}
 	
 	public RobotInformationPassThrough getInfo() { return robotInfo; }
 	

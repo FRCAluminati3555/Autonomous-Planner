@@ -13,7 +13,6 @@ import Utils.Util;
 
 public abstract class Entity {
 	protected Handler handler;
-	protected ActionQueue actionQueue;
 	
 	protected WrapperStaticBody body;
 	protected Vector2f movementSpeed;
@@ -21,7 +20,6 @@ public abstract class Entity {
 	public Entity(Handler handler, WrapperModel wrapperModel, Texture2D texture) {
 		this.handler = handler;
 		
-		actionQueue = new ActionQueue();
 		body = new WrapperStaticBody(wrapperModel, texture);
 	}
 	
@@ -37,12 +35,10 @@ public abstract class Entity {
 	}
 	
 	public void update(float delta) {
-		actionQueue.update(delta);
+		
 	}
 	
 	public void render() { body.render(); }
-	
-	public void addAction(Action a) { if(a != null) actionQueue.add(a); }
 	
 	public float getX() { return body.getX(); }
 	public float getZ() { return body.getZ(); }
