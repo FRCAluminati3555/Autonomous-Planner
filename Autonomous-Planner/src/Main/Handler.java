@@ -33,9 +33,9 @@ public class Handler {
 		world.init();
 		
 		mouseManager = new MouseManager(this);
-		frame = new Frame(this);
+//		frame = new Frame(this);
 		
-		frame.getConfigPanel().getRl().doClick();
+//		frame.getConfigPanel().getRl().doClick();
 	}
 	
 	public Frame getFrame() { return frame; }

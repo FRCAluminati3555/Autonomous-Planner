@@ -9,6 +9,7 @@ import com.Engine.Util.Vectors.Vector2f;
 import com.Engine.Util.Vectors.Vector3f;
 
 import Entity.FreeMoving.Robot;
+import Entity.WorldObjects.FieldObject;
 import Entity.WorldObjects.Switch;
 import Entity.WorldObjects.WorldObject;
 import Entity.WorldObjects.Lot.Field;
@@ -33,6 +34,9 @@ public class World {
 	private int replaceIndex;
 	private int replaceTeamNumber;
 	
+	private FieldObject fieldObject;
+	private Switch switchObject;
+	
 	public World(Handler handler) {
 		this.handler = handler;
 		
@@ -46,27 +50,20 @@ public class World {
 	public void init() {
 		VectorModel.init(Game.physicsShader);
 		
-		field = new Field(handler, new Vector3f(), new Vector2f(82, 80));
 		sun.add(new Light(new Vector3f(41, 100, 20), new Vector3f(1), new Vector3f(.5, 0, 0)));
-		
+
+		field = new Field(handler, new Vector3f(), new Vector2f(80, 82));
 		robots = new Robot[3];
+		switchObject = new Switch(handler, field); 
 		
-//		robots[0] = new Robot(handler, 3555, 40);
-//		robots[1] = new Robot(handler, 1729, 70);
-//		robots[2] = new Robot(handler, 1010, 10);
-		
-		s = new Switch(handler, field);
-		
-		place(s, new Vector2f(22, 36));
+		place(switchObject, new Vector2f(22, 36));
 		replaceIndex = -1;
+
+		fieldObject = new FieldObject(handler, field);
+		fieldObject.setPosition2D(new Vector2f());
 		
-		replaceRobot(0, 3555);
-		
-//		robots[0] = new Robot(handler, 3555);
-//		handler.getFrame().updateRobotNumbers(3555);
+//		replaceRobot(0, 3555);
 	}
-	
-	private Switch s;
 	
 	public boolean place(WorldObject object, Vector3f position, float angle) {
 		object.setAngle(angle);
@@ -105,6 +102,7 @@ public class World {
 	
 	public void render() {
 		field.render();
+		fieldObject.render();
 		
 		for(Robot robot : robots) {
 			if(robot != null)

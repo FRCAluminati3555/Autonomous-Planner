@@ -31,6 +31,12 @@ public class Assets {
 	public static Texture2D switchTexture;
 	
 	public static Texture2D blankTexture;
+
+	public static WrapperModel fieldModel;
+	public static Texture2D fieldTexture;
+	
+	public static WrapperModel powerCubeModel;
+	public static Texture2D powerCubeTexture;
 	
 	public static Font font;
 	
@@ -104,6 +110,12 @@ public class Assets {
 		sampleFloorTextures.setNumberOfRows(1);
 		
 		blankTexture = AssetLoader.loadTexture(AssetLoader.TEXTURE_PATH + "Blank.png");
+		
+		powerCubeModel = new WrapperModel(AssetLoader.MODEL_PATH + "Power-Cube.obj", defaultShader);
+		powerCubeTexture = blankTexture;
+		
+		fieldModel = new WrapperModel(AssetLoader.MODEL_PATH + "Field.obj", defaultShader);
+		fieldTexture = blankTexture;
 		
 //		r3555Model = new WrapperModel(AssetLoader.MODEL_PATH + "r3555.obj", defaultShader);
 //		r3555Texture = blankTexture;//AssetLoader.loadTexture(AssetLoader.TEXTURE_PATH + "r3555.png");
