@@ -1,15 +1,13 @@
 package Entity.WorldObjects;
 
-import com.Engine.RenderEngine.Textures.Texture2D;
-
 import Entity.WorldObjects.Lot.Field;
-import Entity.WrapperBodies.WrapperModel;
+import Main.Assets;
 import Main.Handler;
 
 public class Cube extends WorldObject {
 
-	public Cube(Handler handler, Field lot, WrapperModel wrapperModel, Texture2D texture) {
-		super(handler, lot, wrapperModel, texture);
+	public Cube(Handler handler, Field lot) {
+		super(handler, lot, Assets.powerCubeModel, Assets.powerCubeTexture);
 		
 	}
 

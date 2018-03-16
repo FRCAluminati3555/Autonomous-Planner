@@ -30,7 +30,7 @@ public class CameraMovement {
 
 		setPosition(spawn);
 		
-		rotationToWorld = new Vector3f(40, 180, 0);
+		rotationToWorld = new Vector3f(54, 180, 0);
 		setRotation(rotationToWorld);
 	}
 	
